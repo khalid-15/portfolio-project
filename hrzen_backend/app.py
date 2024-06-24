@@ -4,7 +4,7 @@ from sqlalchemy.exc import IntegrityError
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///hrzen.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Add this line to suppress the warning
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 class Employee(db.Model):
@@ -26,6 +26,9 @@ def get_employees():
 @app.route('/api/employees', methods=['POST'])
 def add_employee():
     data = request.json
+    if 'name' not in data or 'email' not in data:
+        return jsonify({'message': 'Name and Email are required'}), 400
+
     new_employee = Employee(name=data['name'], position=data['position'], salary=data['salary'], email=data['email'])
     try:
         db.session.add(new_employee)
@@ -44,12 +47,8 @@ def update_employee(id):
         employee.position = data['position']
         employee.salary = data['salary']
         employee.email = data['email']
-        try:
-            db.session.commit()
-            return jsonify({'message': 'Employee updated successfully'})
-        except IntegrityError:
-            db.session.rollback()
-            return jsonify({'message': 'Employee with this email already exists'}), 400
+        db.session.commit()
+        return jsonify({'message': 'Employee updated successfully'})
     return jsonify({'message': 'Employee not found'}), 404
 
 @app.route('/api/employees/<int:id>', methods=['DELETE'])
