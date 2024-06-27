@@ -32,7 +32,9 @@
 </template>
 
 <script>
-import axios from 'axios'
+import axios from 'axios';
+import { useToast } from 'vue-toast-notification';
+
 export default {
   name: 'UpdateEmployee',
   props: {
@@ -67,12 +69,15 @@ export default {
       this.localDialog = false;
     },
     updateEmployee() {
+      const toast = useToast();
       axios.put(`http://localhost:5000/api/employees/${this.localEmployee.id}`, this.localEmployee)
         .then(() => {
           this.$emit('employee-updated');
+          toast.success('Employee updated successfully!');
           this.closeDialog();
         })
         .catch(error => {
+          toast.error('There was an error updating the employee!');
           console.error("There was an error updating the employee!", error);
         });
     }

@@ -46,6 +46,7 @@
 import axios from 'axios';
 import AddEmployee from '@/components/AddEmployee.vue';
 import UpdateEmployee from '@/components/UpdateEmployee.vue';
+import { useToast } from 'vue-toast-notification';
 
 export default {
   name: 'EmployeeList',
@@ -96,12 +97,15 @@ export default {
       this.confirmDeleteDialog = true;
     },
     deleteEmployee() {
+      const toast = useToast();
       axios.delete(`http://localhost:5000/api/employees/${this.employeeToDelete}`)
         .then(() => {
           this.fetchEmployees();
           this.confirmDeleteDialog = false;
+          toast.success('Employee deleted successfully!');
         })
         .catch(error => {
+          toast.error('There was an error deleting the employee!');
           console.error("There was an error deleting the employee!", error);
         });
     },
@@ -134,11 +138,11 @@ export default {
 
 <style scoped>
 .v-btn {
-  margin-right: 8px; /* Add some margin between buttons */
+  margin-right: 8px;
 }
 
 .v-card-title {
-  background-color: #E8EAF6; /* secondary color */
-  color: black; 
+  background-color: #E8EAF6;
+  color: black;
 }
 </style>
