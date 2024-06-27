@@ -1,16 +1,12 @@
 <template>
-  <div id="app">
-    <EmployeeList />
-  </div>
+  <router-view />
 </template>
 
 <script>
-import EmployeeList from './components/EmployeeList.vue';
-
 export default {
-  name: 'App',
-  components: {
-    EmployeeList
-  }
+  name: 'App'
 };
 </script>
+
+<style>
+</style>
