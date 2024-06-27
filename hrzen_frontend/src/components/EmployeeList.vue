@@ -19,12 +19,26 @@
       >
         <template v-slot:[`item.actions`]="{ item }">
           <v-icon small class="mr-2" @click="showEditEmployeeDialog(item)">mdi-pencil</v-icon>
-          <v-icon small @click="deleteEmployee(item.id)">mdi-delete</v-icon>
+          <v-icon small @click="confirmDeleteEmployee(item.id)">mdi-delete</v-icon>
         </template>
       </v-data-table>
     </v-card>
     <AddEmployee v-model:dialog="addDialog" @employee-added="fetchEmployees" />
     <UpdateEmployee v-model:dialog="editDialog" :employee="selectedEmployee" @employee-updated="fetchEmployees" />
+
+    <v-dialog v-model="confirmDeleteDialog" max-width="500px">
+      <v-card>
+        <v-card-title>
+          <span class="headline">Delete Employee</span>
+        </v-card-title>
+        <v-card-text>Are you sure you want to delete this employee?</v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="red darken-1" text @click="confirmDeleteDialog = false">Cancel</v-btn>
+          <v-btn color="green darken-1" text @click="deleteEmployee">Confirm</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -52,7 +66,9 @@ export default {
       ],
       addDialog: false,
       editDialog: false,
-      selectedEmployee: {}
+      confirmDeleteDialog: false,
+      selectedEmployee: null,
+      employeeToDelete: null
     };
   },
   created() {
@@ -63,8 +79,6 @@ export default {
       axios.get('http://localhost:5000/api/employees')
         .then(response => {
           this.employees = response.data;
-          console.log("Employees fetched:", response.data);
-          console.log("Employees bound to table:", this.employees);
         })
         .catch(error => {
           console.error("There was an error fetching the employees!", error);
@@ -77,10 +91,15 @@ export default {
       this.selectedEmployee = { ...employee };
       this.editDialog = true;
     },
-    deleteEmployee(id) {
-      axios.delete(`http://localhost:5000/api/employees/${id}`)
+    confirmDeleteEmployee(id) {
+      this.employeeToDelete = id;
+      this.confirmDeleteDialog = true;
+    },
+    deleteEmployee() {
+      axios.delete(`http://localhost:5000/api/employees/${this.employeeToDelete}`)
         .then(() => {
           this.fetchEmployees();
+          this.confirmDeleteDialog = false;
         })
         .catch(error => {
           console.error("There was an error deleting the employee!", error);
@@ -120,6 +139,6 @@ export default {
 
 .v-card-title {
   background-color: #E8EAF6; /* secondary color */
-  color: black; /* Ensure the text is readable on the background */
+  color: black; 
 }
 </style>
