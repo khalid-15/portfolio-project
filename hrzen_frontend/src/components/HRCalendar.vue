@@ -1,27 +1,47 @@
 <template>
   <v-container>
-    <v-card>
-      <v-card-title>
-        HR Calendar
-        <v-spacer></v-spacer>
-        <v-btn @click="showAddEventDialog" color="primary">Add Event</v-btn>
-        <v-btn @click="fetchEvents" color="secondary">Refresh Events</v-btn>
-      </v-card-title>
-      <v-card-text>
-        <v-calendar
-          v-model="selectedDate"
-          @click:date="showEvents"
-          :events="events"
-        ></v-calendar>
-      </v-card-text>
-    </v-card>
+    <v-row>
+      <v-col cols="12" md="8">
+        <v-card>
+          <v-card-title>
+            HR Calendar
+            <v-spacer></v-spacer>
+            <v-btn @click="showAddEventDialog" color="primary" class="mr-2">Add Event</v-btn>
+            <v-btn @click="fetchEvents" color="secondary">Refresh Events</v-btn>
+          </v-card-title>
+          <v-card-text>
+            <v-calendar
+              v-model="selectedDate"
+              @click:date="showEvents"
+              :events="events"
+            ></v-calendar>
+          </v-card-text>
+        </v-card>
+      </v-col>
+      <v-col cols="12" md="4">
+        <v-card>
+          <v-card-title>
+            Events on {{ selectedDate.toDateString() }}
+          </v-card-title>
+          <v-card-text>
+            <div v-for="event in filteredEvents" :key="event.id" class="mb-2">
+              <div>{{ event.title }}</div>
+              <div>{{ event.date }}</div>
+              <v-icon small color="primary" class="mr-2" @click="showEditEventDialog(event)">mdi-pencil</v-icon>
+              <v-icon small color="red" @click="deleteEvent(event.id)">mdi-delete</v-icon>
+              <v-divider class="my-2"></v-divider>
+            </div>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
     <AddEventDialog v-model:dialog="addDialog" @event-added="fetchEvents" />
     <EditEventDialog v-model:dialog="editDialog" :event="selectedEvent" @event-updated="fetchEvents" />
   </v-container>
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import AddEventDialog from './AddEventDialog.vue';
 import EditEventDialog from './EditEventDialog.vue';
 import axios from 'axios';
@@ -43,11 +63,7 @@ export default {
     const fetchEvents = async () => {
       try {
         const response = await axios.get('http://localhost:5000/api/events');
-        events.value = response.data.map(event => ({
-          ...event,
-          start: new Date(event.date),
-          end: new Date(event.date),
-        }));
+        events.value = response.data;
       } catch (error) {
         toast.error('Failed to fetch events');
       }
@@ -57,20 +73,30 @@ export default {
       addDialog.value = true;
     };
 
-    const showEvents = (date) => {
-      selectedDate.value = date;
-      const dayEvents = events.value.filter(event => {
-        const eventDate = new Date(event.start).toDateString();
-        return eventDate === date.toDateString();
-      });
+    const showEditEventDialog = (event) => {
+      selectedEvent.value = event;
+      editDialog.value = true;
+    };
 
-      if (dayEvents.length > 0) {
-        selectedEvent.value = dayEvents[0];
-        editDialog.value = true;
-      } else {
-        toast.info('No events for the selected date');
+    const deleteEvent = async (id) => {
+      try {
+        await axios.delete(`http://localhost:5000/api/events/${id}`);
+        toast.success('Event deleted successfully');
+        fetchEvents();
+      } catch (error) {
+        toast.error('Failed to delete event');
       }
     };
+
+    const showEvents = (date) => {
+      selectedDate.value = date;
+    };
+
+    const filteredEvents = computed(() => {
+      return events.value.filter(event => event.date === selectedDate.value.toISOString().split('T')[0]);
+    });
+
+    fetchEvents();
 
     return {
       addDialog,
@@ -80,7 +106,10 @@ export default {
       events,
       fetchEvents,
       showAddEventDialog,
-      showEvents
+      showEditEventDialog,
+      deleteEvent,
+      showEvents,
+      filteredEvents
     };
   }
 };
@@ -90,5 +119,12 @@ export default {
 .v-card-title {
   background-color: #3F51B5;
   color: white;
+}
+.mr-2 {
+  margin-right: 8px;
+}
+.my-2 {
+  margin-top: 8px;
+  margin-bottom: 8px;
 }
 </style>
