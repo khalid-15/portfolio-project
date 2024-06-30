@@ -3,7 +3,7 @@
     <v-row>
       <v-col cols="12" md="8">
         <v-card>
-          <v-card-title>
+          <v-card-title class="d-flex flex-row mb-6">
             HR Calendar
             <v-spacer></v-spacer>
             <v-btn @click="showAddEventDialog" color="primary" class="mr-2">Add Event</v-btn>

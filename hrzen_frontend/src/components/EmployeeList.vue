@@ -4,24 +4,22 @@
       <v-card-title class="d-flex flex-row mb-6">
         Employees
         <v-spacer></v-spacer>
-        <v-btn icon class="mr-2" @click="showAddEmployeeDialog">
-          <v-icon color="primary">mdi-plus</v-icon>
-        </v-btn>
-        <v-btn icon @click="downloadEmployees">
-          <v-icon color="primary">mdi-download</v-icon>
-        </v-btn>
+        <v-btn @click="showAddEmployeeDialog" color="primary" class="mr-2">Add Employee</v-btn>
+        <v-btn @click="downloadEmployees" color="secondary">Download Employees</v-btn>
       </v-card-title>
-      <v-data-table
-        :headers="headers"
-        :items="employees"
-        height="400"
-        class="elevation-1"
-      >
-        <template v-slot:[`item.actions`]="{ item }">
-          <v-icon small class="mr-2" @click="showEditEmployeeDialog(item)">mdi-pencil</v-icon>
-          <v-icon small @click="confirmDeleteEmployee(item.id)">mdi-delete</v-icon>
-        </template>
-      </v-data-table>
+      <v-card-text>
+        <v-data-table
+          :headers="headers"
+          :items="employees"
+          height="100%"
+          class="elevation-1"
+        >
+          <template v-slot:[`item.actions`]="{ item }">
+            <v-icon small color="primary" class="mr-2" @click="showEditEmployeeDialog(item)">mdi-pencil</v-icon>
+            <v-icon small color="red" @click="confirmDeleteEmployee(item.id)">mdi-delete</v-icon>
+          </template>
+        </v-data-table>
+      </v-card-text>
     </v-card>
     <AddEmployee v-model:dialog="addDialog" @employee-added="fetchEmployees" />
     <UpdateEmployee v-model:dialog="editDialog" :employee="selectedEmployee" @employee-updated="fetchEmployees" />
@@ -137,12 +135,11 @@ export default {
 </script>
 
 <style scoped>
-.v-btn {
-  margin-right: 8px;
-}
-
 .v-card-title {
-  background-color: #E8EAF6;
-  color: black;
+  background-color: #3F51B5;
+  color: white;
+}
+.mr-2 {
+  margin-right: 8px;
 }
 </style>
