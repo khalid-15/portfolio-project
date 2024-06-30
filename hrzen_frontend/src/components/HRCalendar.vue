@@ -28,7 +28,7 @@
               <div>{{ event.title }}</div>
               <div>{{ event.date }}</div>
               <v-icon small color="primary" class="mr-2" @click="showEditEventDialog(event)">mdi-pencil</v-icon>
-              <v-icon small color="red" @click="deleteEvent(event.id)">mdi-delete</v-icon>
+              <v-icon small color="red" @click="confirmDelete(event.id)">mdi-delete</v-icon>
               <v-divider class="my-2"></v-divider>
             </div>
           </v-card-text>
@@ -37,6 +37,17 @@
     </v-row>
     <AddEventDialog v-model:dialog="addDialog" @event-added="fetchEvents" />
     <EditEventDialog v-model:dialog="editDialog" :event="selectedEvent" @event-updated="fetchEvents" />
+    <v-dialog v-model="deleteDialog" max-width="400">
+      <v-card>
+        <v-card-title class="headline">Confirm Delete</v-card-title>
+        <v-card-text>Are you sure you want to delete this event?</v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" text @click="deleteDialog = false">Cancel</v-btn>
+          <v-btn color="red darken-1" text @click="deleteEvent">Delete</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -55,9 +66,11 @@ export default {
   setup() {
     const addDialog = ref(false);
     const editDialog = ref(false);
+    const deleteDialog = ref(false);
     const selectedEvent = ref(null);
     const selectedDate = ref(new Date());
     const events = ref([]);
+    const eventIdToDelete = ref(null);
     const toast = useToast();
 
     const fetchEvents = async () => {
@@ -78,13 +91,20 @@ export default {
       editDialog.value = true;
     };
 
-    const deleteEvent = async (id) => {
+    const confirmDelete = (id) => {
+      eventIdToDelete.value = id;
+      deleteDialog.value = true;
+    };
+
+    const deleteEvent = async () => {
       try {
-        await axios.delete(`http://localhost:5000/api/events/${id}`);
+        await axios.delete(`http://localhost:5000/api/events/${eventIdToDelete.value}`);
         toast.success('Event deleted successfully');
         fetchEvents();
+        deleteDialog.value = false;
       } catch (error) {
         toast.error('Failed to delete event');
+        deleteDialog.value = false;
       }
     };
 
@@ -101,12 +121,15 @@ export default {
     return {
       addDialog,
       editDialog,
+      deleteDialog,
       selectedEvent,
       selectedDate,
       events,
+      eventIdToDelete,
       fetchEvents,
       showAddEventDialog,
       showEditEventDialog,
+      confirmDelete,
       deleteEvent,
       showEvents,
       filteredEvents
