@@ -58,7 +58,7 @@ export default {
       try {
         await axios.put(`http://localhost:5000/api/events/${localEvent.value.id}`, {
           title: localEvent.value.title,
-          date: localEvent.value.date.toISOString()
+          date: localEvent.value.date.toISOString().split('T')[0]
         });
         toast.success('Event updated successfully');
         emit('event-updated');
