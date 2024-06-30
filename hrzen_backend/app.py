@@ -2,9 +2,10 @@ from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
 from flask_cors import CORS
+from datetime import datetime
 
 app = Flask(__name__)
-CORS(app)  # This will enable CORS for all routes
+CORS(app) 
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///hrzen.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -16,6 +17,11 @@ class Employee(db.Model):
     position = db.Column(db.String(255))
     salary = db.Column(db.Float)
     email = db.Column(db.String(255), unique=True)
+
+class Event(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(255), nullable=False)
+    date = db.Column(db.Date, nullable=False)
 
 db.create_all()
 
@@ -62,6 +68,48 @@ def delete_employee(id):
         db.session.commit()
         return jsonify({'message': 'Employee deleted successfully'})
     return jsonify({'message': 'Employee not found'}), 404
+
+@app.route('/api/events', methods=['GET'])
+def get_events():
+    events = Event.query.all()
+    return jsonify([{
+        'id': event.id, 'title': event.title, 'date': event.date.strftime('%Y-%m-%d')
+    } for event in events])
+
+@app.route('/api/events', methods=['POST'])
+def add_event():
+    data = request.json
+    try:
+        date = datetime.strptime(data['date'], '%Y-%m-%dT%H:%M:%S.%fZ').date()
+    except ValueError:
+        return jsonify({'message': 'Invalid date format'}), 400
+    new_event = Event(title=data['title'], date=date)
+    db.session.add(new_event)
+    db.session.commit()
+    return jsonify({'message': 'Event added successfully'}), 201
+
+@app.route('/api/events/<int:id>', methods=['PUT'])
+def update_event(id):
+    data = request.json
+    event = Event.query.get(id)
+    if event:
+        try:
+            event.date = datetime.strptime(data['date'], '%Y-%m-%dT%H:%M:%S.%fZ').date()
+        except ValueError:
+            return jsonify({'message': 'Invalid date format'}), 400
+        event.title = data['title']
+        db.session.commit()
+        return jsonify({'message': 'Event updated successfully'})
+    return jsonify({'message': 'Event not found'}), 404
+
+@app.route('/api/events/<int:id>', methods=['DELETE'])
+def delete_event(id):
+    event = Event.query.get(id)
+    if event:
+        db.session.delete(event)
+        db.session.commit()
+        return jsonify({'message': 'Event deleted successfully'})
+    return jsonify({'message': 'Event not found'}), 404
 
 @app.route('/')
 def home():
