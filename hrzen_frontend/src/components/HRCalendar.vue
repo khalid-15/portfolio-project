@@ -1,72 +1,94 @@
 <template>
-  <v-app>
-    <v-container>
-      <v-card>
-        <v-card-title class="d-flex flex-row mb-6">
-          Employees
-          <v-spacer></v-spacer>
-        </v-card-title>
-        <v-data-table
-          :headers="headers"
-          :items="employees"
-          class="elevation-1"
-        ></v-data-table>
-      </v-card>
-    </v-container>
-  </v-app>
+  <v-container>
+    <v-card>
+      <v-card-title>
+        HR Calendar
+        <v-spacer></v-spacer>
+        <v-btn @click="showAddEventDialog" color="primary">Add Event</v-btn>
+        <v-btn @click="fetchEvents" color="secondary">Refresh Events</v-btn>
+      </v-card-title>
+      <v-card-text>
+        <v-calendar
+          v-model="selectedDate"
+          @click:date="showEvents"
+          :events="events"
+        ></v-calendar>
+      </v-card-text>
+    </v-card>
+    <AddEventDialog v-model:dialog="addDialog" @event-added="fetchEvents" />
+    <EditEventDialog v-model:dialog="editDialog" :event="selectedEvent" @event-updated="fetchEvents" />
+  </v-container>
 </template>
 
 <script>
+import { ref } from 'vue';
+import AddEventDialog from './AddEventDialog.vue';
+import EditEventDialog from './EditEventDialog.vue';
+import axios from 'axios';
+import { useToast } from 'vue-toast-notification';
+
 export default {
-  name: 'EmployeeList',
-  data() {
-    return {
-      employees: [
-        {
-          id: 1,
-          name: 'John Doe',
-          position: 'Developer',
-          salary: 60000,
-          email: 'john.doe@example.com',
-        },
-        {
-          id: 2,
-          name: 'Jane Smith',
-          position: 'Manager',
-          salary: 80000,
-          email: 'jane.smith@example.com',
-        },
-      ],
-      headers: [
-        { text: 'ID', value: 'id' },
-        { text: 'Name', value: 'name' },
-        { text: 'Position', value: 'position' },
-        { text: 'Salary', value: 'salary' },
-        { text: 'Email', value: 'email' },
-      ],
-    };
+  components: {
+    AddEventDialog,
+    EditEventDialog
   },
+  setup() {
+    const addDialog = ref(false);
+    const editDialog = ref(false);
+    const selectedEvent = ref(null);
+    const selectedDate = ref(new Date());
+    const events = ref([]);
+    const toast = useToast();
+
+    const fetchEvents = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/events');
+        events.value = response.data.map(event => ({
+          ...event,
+          start: new Date(event.date),
+          end: new Date(event.date),
+        }));
+      } catch (error) {
+        toast.error('Failed to fetch events');
+      }
+    };
+
+    const showAddEventDialog = () => {
+      addDialog.value = true;
+    };
+
+    const showEvents = (date) => {
+      selectedDate.value = date;
+      const dayEvents = events.value.filter(event => {
+        const eventDate = new Date(event.start).toDateString();
+        return eventDate === date.toDateString();
+      });
+
+      if (dayEvents.length > 0) {
+        selectedEvent.value = dayEvents[0];
+        editDialog.value = true;
+      } else {
+        toast.info('No events for the selected date');
+      }
+    };
+
+    return {
+      addDialog,
+      editDialog,
+      selectedEvent,
+      selectedDate,
+      events,
+      fetchEvents,
+      showAddEventDialog,
+      showEvents
+    };
+  }
 };
 </script>
 
 <style scoped>
-.v-btn {
-  margin-right: 8px; /* Add some margin between buttons */
-}
-
 .v-card-title {
-  background-color: #E8EAF6; /* secondary color */
-  color: black; /* Ensure the text is readable on the background */
-}
-</style>
-
-<style scoped>
-.v-btn {
-  margin-right: 8px; /* Add some margin between buttons */
-}
-
-.v-card-title {
-  background-color: #E8EAF6; /* secondary color */
-  color: black; /* Ensure the text is readable on the background */
+  background-color: #3F51B5;
+  color: white;
 }
 </style>
