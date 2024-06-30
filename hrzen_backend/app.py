@@ -5,7 +5,7 @@ from flask_cors import CORS
 from datetime import datetime
 
 app = Flask(__name__)
-CORS(app) 
+CORS(app)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///hrzen.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -22,6 +22,12 @@ class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(255), nullable=False)
     date = db.Column(db.Date, nullable=False)
+
+class Attendance(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    employee_id = db.Column(db.Integer, db.ForeignKey('employee.id'), nullable=False)
+    date = db.Column(db.Date, nullable=False)
+    status = db.Column(db.String(50), nullable=False)
 
 db.create_all()
 
@@ -110,6 +116,41 @@ def delete_event(id):
         db.session.commit()
         return jsonify({'message': 'Event deleted successfully'})
     return jsonify({'message': 'Event not found'}), 404
+
+@app.route('/api/attendance', methods=['GET'])
+def get_attendance():
+    attendance = Attendance.query.all()
+    return jsonify([{
+        'id': att.id, 'employee_id': att.employee_id, 'date': att.date.strftime('%Y-%m-%d'), 'status': att.status
+    } for att in attendance])
+
+@app.route('/api/attendance', methods=['POST'])
+def add_attendance():
+    data = request.json
+    new_attendance = Attendance(employee_id=data['employee_id'], date=datetime.strptime(data['date'], '%Y-%m-%d').date(), status=data['status'])
+    db.session.add(new_attendance)
+    db.session.commit()
+    return jsonify({'message': 'Attendance added successfully'}), 201
+
+@app.route('/api/attendance/<int:id>', methods=['PUT'])
+def update_attendance(id):
+    data = request.json
+    attendance = Attendance.query.get(id)
+    if attendance:
+        attendance.date = datetime.strptime(data['date'], '%Y-%m-%d').date()
+        attendance.status = data['status']
+        db.session.commit()
+        return jsonify({'message': 'Attendance updated successfully'})
+    return jsonify({'message': 'Attendance not found'}), 404
+
+@app.route('/api/attendance/<int:id>', methods=['DELETE'])
+def delete_attendance(id):
+    attendance = Attendance.query.get(id)
+    if attendance:
+        db.session.delete(attendance)
+        db.session.commit()
+        return jsonify({'message': 'Attendance deleted successfully'})
+    return jsonify({'message': 'Attendance not found'}), 404
 
 @app.route('/')
 def home():
