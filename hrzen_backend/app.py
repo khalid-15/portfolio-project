@@ -2,13 +2,16 @@ from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
 from flask_cors import CORS
-from datetime import datetime
+from datetime import datetime, timedelta
+from werkzeug.security import generate_password_hash, check_password_hash
+import jwt
 
 app = Flask(__name__)
 CORS(app)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///hrzen.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = 'your_secret_key'
 db = SQLAlchemy(app)
 
 class Employee(db.Model):
@@ -17,6 +20,8 @@ class Employee(db.Model):
     position = db.Column(db.String(255))
     salary = db.Column(db.Float)
     email = db.Column(db.String(255), unique=True)
+    role = db.Column(db.String(50), nullable=False, default='employee')
+    password = db.Column(db.String(255), nullable=False)
 
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -28,14 +33,33 @@ class Attendance(db.Model):
     employee_id = db.Column(db.Integer, db.ForeignKey('employee.id'), nullable=False)
     date = db.Column(db.Date, nullable=False)
     status = db.Column(db.String(50), nullable=False)
+    employee = db.relationship('Employee', backref=db.backref('attendance', lazy=True))
 
 db.create_all()
+
+@app.route('/register', methods=['POST'])
+def register():
+    data = request.json
+    hashed_password = generate_password_hash(data['password'], method='sha256')
+    new_user = Employee(name=data['name'], position=data['position'], salary=data['salary'], email=data['email'], role=data['role'], password=hashed_password)
+    db.session.add(new_user)
+    db.session.commit()
+    return jsonify({'message': 'Registered successfully'}), 201
+
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.json
+    user = Employee.query.filter_by(email=data['email']).first()
+    if user and check_password_hash(user.password, data['password']):
+        token = jwt.encode({'id': user.id, 'exp': datetime.utcnow() + timedelta(hours=24)}, app.config['SECRET_KEY'])
+        return jsonify({'token': token, 'role': user.role}), 200
+    return jsonify({'message': 'Invalid credentials'}), 401
 
 @app.route('/api/employees', methods=['GET'])
 def get_employees():
     employees = Employee.query.all()
     return jsonify([{
-        'id': emp.id, 'name': emp.name, 'position': emp.position, 'salary': emp.salary, 'email': emp.email
+        'id': emp.id, 'name': emp.name, 'position': emp.position, 'salary': emp.salary, 'email': emp.email, 'role': emp.role
     } for emp in employees])
 
 @app.route('/api/employees', methods=['POST'])
@@ -44,7 +68,8 @@ def add_employee():
     if 'name' not in data or 'email' not in data:
         return jsonify({'message': 'Name and Email are required'}), 400
 
-    new_employee = Employee(name=data['name'], position=data['position'], salary=data['salary'], email=data['email'])
+    hashed_password = generate_password_hash(data['password'], method='sha256')
+    new_employee = Employee(name=data['name'], position=data['position'], salary=data['salary'], email=data['email'], role=data['role'], password=hashed_password)
     try:
         db.session.add(new_employee)
         db.session.commit()
@@ -62,6 +87,9 @@ def update_employee(id):
         employee.position = data['position']
         employee.salary = data['salary']
         employee.email = data['email']
+        employee.role = data['role']
+        if 'password' in data:
+            employee.password = generate_password_hash(data['password'], method='sha256')
         db.session.commit()
         return jsonify({'message': 'Employee updated successfully'})
     return jsonify({'message': 'Employee not found'}), 404
@@ -119,10 +147,14 @@ def delete_event(id):
 
 @app.route('/api/attendance', methods=['GET'])
 def get_attendance():
-    attendance = Attendance.query.all()
+    attendance_records = Attendance.query.join(Employee).all()
     return jsonify([{
-        'id': att.id, 'employee_id': att.employee_id, 'date': att.date.strftime('%Y-%m-%d'), 'status': att.status
-    } for att in attendance])
+        'id': record.id,
+        'employee_id': record.employee_id,
+        'employee_name': record.employee.name,
+        'date': record.date.strftime('%Y-%m-%d'),
+        'status': record.status
+    } for record in attendance_records])
 
 @app.route('/api/attendance', methods=['POST'])
 def add_attendance():
