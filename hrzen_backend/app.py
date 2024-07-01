@@ -97,6 +97,31 @@ def get_employees():
 #         db.session.rollback()
 #         return jsonify({'message': 'Employee with this email already exists'}), 400
 
+# @app.route('/api/employees', methods=['POST'])
+# def add_employee():
+    data = request.json
+    required_fields = ['name', 'email', 'role', 'password']
+    for field in required_fields:
+        if field not in data:
+            return jsonify({'message': f'{field} is required'}), 400
+
+    hashed_password = generate_password_hash(data['password'], method='sha256')
+    new_employee = Employee(
+        name=data['name'],
+        position=data.get('position', ''),
+        salary=data.get('salary', 0),
+        email=data['email'],
+        role=data['role'],
+        password=hashed_password
+    )
+    try:
+        db.session.add(new_employee)
+        db.session.commit()
+        return jsonify({'message': 'Employee added successfully'}), 201
+    except IntegrityError:
+        db.session.rollback()
+        return jsonify({'message': 'Employee with this email already exists'}), 400
+
 @app.route('/api/employees', methods=['POST'])
 def add_employee():
     data = request.json
