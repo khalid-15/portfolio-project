@@ -1,18 +1,14 @@
 <template>
-  <v-container class="d-flex justify-center align-center" style="height: 100vh;">
-    <v-card>
-      <v-card-title>
-        <span class="headline">Register</span>
-      </v-card-title>
+  <v-container class="d-flex justify-center align-center login-register-container">
+    <v-card class="pa-5" width="400">
+      <v-card-title>Register</v-card-title>
       <v-card-text>
         <v-form @submit.prevent="register">
-          <v-text-field v-model="name" label="Name" required></v-text-field>
-          <v-text-field v-model="email" label="Email" required></v-text-field>
+          <v-text-field label="Name" v-model="name" required></v-text-field>
+          <v-text-field label="Email" v-model="email" required></v-text-field>
           <v-select v-model="role" :items="roles" label="Role" required></v-select>
-          <v-text-field v-model="password" label="Password" type="password" required></v-text-field>
-          <v-card-actions>
-            <v-btn type="submit" color="primary">Register</v-btn>
-          </v-card-actions>
+          <v-text-field label="Password" v-model="password" type="password" required></v-text-field>
+          <v-btn class="custom-btn mt-4" type="submit">Register</v-btn>
         </v-form>
       </v-card-text>
     </v-card>
@@ -57,18 +53,27 @@ export default {
 </script>
 
 <style scoped>
-.v-container {
-  max-width: 400px;
+.login-register-container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .v-card {
-  width: 100%;
-  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.v-card-title {
-  background-color: #E8EAF6;
-  color: black;
-  text-align: center;
+.custom-btn {
+  width: 100%;
+  background-color: #1976D2;
+  color: white;
+  border-radius: 8px;
+  padding: 10px 0;
+  transition: background-color 0.3s;
+}
+
+.custom-btn:hover {
+  background-color: #1565C0;
 }
 </style>
