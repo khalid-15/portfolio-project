@@ -4,6 +4,8 @@ import HomePage from '@/components/HomePage.vue';
 import EmployeeList from '@/components/EmployeeList.vue';
 import HRCalendar from '@/components/HRCalendar.vue';
 import HRPayroll from '@/components/HRPayroll.vue';
+import AttendanceEmployee from '@/components/AttendanceEmployee.vue';
+import AttendanceHR from '@/components/AttendanceHR.vue';
 
 const routes = [
   {
@@ -19,6 +21,16 @@ const routes = [
         path: 'employees',
         name: 'EmployeeList',
         component: EmployeeList
+      },
+      {
+        path: 'attendance',
+        name: 'AttendanceEmployee',
+        component: AttendanceEmployee
+      },
+      {
+        path: 'attendance/hr',
+        name: 'AttendanceHR',
+        component: AttendanceHR
       },
       {
         path: 'calendar',
