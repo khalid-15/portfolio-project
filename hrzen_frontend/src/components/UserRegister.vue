@@ -1,12 +1,12 @@
 <template>
   <v-container class="d-flex justify-center align-center login-register-container">
     <v-card class="pa-5" width="400">
-      <v-card-title>Register</v-card-title>
+      <v-card-title class="headline">Register</v-card-title>
       <v-card-text>
         <v-form @submit.prevent="register">
           <v-text-field label="Name" v-model="name" required></v-text-field>
           <v-text-field label="Email" v-model="email" required></v-text-field>
-          <v-select v-model="role" :items="roles" label="Role" required></v-select>
+          <v-select label="Role" v-model="role" :items="roles" required></v-select>
           <v-text-field label="Password" v-model="password" type="password" required></v-text-field>
           <v-btn class="custom-btn mt-4" type="submit">Register</v-btn>
         </v-form>
@@ -20,7 +20,7 @@ import axios from 'axios';
 import { useToast } from 'vue-toast-notification';
 
 export default {
-  name: 'RegisterForm',
+  name: 'UserRegister',
   data() {
     return {
       name: '',

@@ -6,7 +6,7 @@
         <v-form>
           <v-text-field label="Email" v-model="email" required></v-text-field>
           <v-text-field label="Password" v-model="password" type="password" required></v-text-field>
-          <v-btn class="custom-btn mt-4" @click="login">Login</v-btn>
+          <v-btn class="custom-btn" @click="login">Login</v-btn>
         </v-form>
       </v-card-text>
     </v-card>
@@ -18,7 +18,7 @@ import axios from 'axios';
 import { useToast } from 'vue-toast-notification';
 
 export default {
-  name: 'LoginPage',
+  name: 'UserLogin',
   data() {
     return {
       email: '',
@@ -35,7 +35,11 @@ export default {
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('role', response.data.role);
         useToast().success('Logged in successfully!');
-        this.$router.push({ name: 'HomePage' });
+        if (response.data.first_login) {
+          this.$router.push({ name: 'ChangePassword' });
+        } else {
+          this.$router.push({ name: 'HomePage' });
+        }
       } catch (error) {
         useToast().error('Login failed!');
         console.error('Login failed:', error);
