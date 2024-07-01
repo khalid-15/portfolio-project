@@ -35,16 +35,28 @@ class Attendance(db.Model):
     status = db.Column(db.String(50), nullable=False)
     employee = db.relationship('Employee', backref=db.backref('attendance', lazy=True))
 
+db.drop_all()
 db.create_all()
 
 @app.route('/register', methods=['POST'])
 def register():
     data = request.json
     hashed_password = generate_password_hash(data['password'], method='sha256')
-    new_user = Employee(name=data['name'], position=data['position'], salary=data['salary'], email=data['email'], role=data['role'], password=hashed_password)
-    db.session.add(new_user)
-    db.session.commit()
-    return jsonify({'message': 'Registered successfully'}), 201
+    new_user = Employee(
+        name=data['name'],
+        position=data.get('position', ''),
+        salary=data.get('salary', 0.0),
+        email=data['email'],
+        role=data['role'],
+        password=hashed_password
+    )
+    try:
+        db.session.add(new_user)
+        db.session.commit()
+        return jsonify({'message': 'Registered successfully'}), 201
+    except IntegrityError:
+        db.session.rollback()
+        return jsonify({'message': 'User with this email already exists'}), 400
 
 @app.route('/login', methods=['POST'])
 def login():
