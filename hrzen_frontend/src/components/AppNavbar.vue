@@ -13,9 +13,9 @@
       hide-details
       class="mx-4"
     ></v-text-field>
-    <v-btn icon>
-      <v-icon>mdi-bell</v-icon>
-    </v-btn>
+    <v-btn v-if="!isAuthenticated" text to="/login">Login</v-btn>
+    <v-btn v-if="!isAuthenticated" text to="/register">Register</v-btn>
+    <v-btn v-if="isAuthenticated" text @click="logout">Logout</v-btn>
   </v-app-bar>
 </template>
 
@@ -26,6 +26,18 @@ export default {
     return {
       search: ''
     };
+  },
+  computed: {
+    isAuthenticated() {
+      return !!localStorage.getItem('token');
+    }
+  },
+  methods: {
+    logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('role');
+      this.$router.push('/login');
+    }
   }
 };
 </script>

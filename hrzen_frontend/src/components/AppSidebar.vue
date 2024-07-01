@@ -25,14 +25,6 @@
           <v-list-item-title>Attendance</v-list-item-title>
         </v-list-item-content>
       </v-list-item>
-      <v-list-item to="/attendance/hr" router>
-        <v-list-item-icon>
-          <v-icon color="primary">mdi-account-badge-horizontal</v-icon>
-        </v-list-item-icon>
-        <v-list-item-content>
-          <v-list-item-title>Attendance HR</v-list-item-title>
-        </v-list-item-content>
-      </v-list-item>
       <v-list-item to="/calendar" router>
         <v-list-item-icon>
           <v-icon color="primary">mdi-calendar</v-icon>
