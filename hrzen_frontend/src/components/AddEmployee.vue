@@ -8,7 +8,7 @@
         <v-container>
           <v-row>
             <v-col cols="12" sm="6" md="4">
-              <v-text-field v-model="localEmployee.name" label="Name"></v-text-field>
+              <v-text-field v-model="localEmployee.name" label="Name" required></v-text-field>
             </v-col>
             <v-col cols="12" sm="6" md="4">
               <v-text-field v-model="localEmployee.position" label="Position"></v-text-field>
@@ -17,7 +17,13 @@
               <v-text-field v-model="localEmployee.salary" label="Salary" type="number"></v-text-field>
             </v-col>
             <v-col cols="12" sm="6" md="4">
-              <v-text-field v-model="localEmployee.email" label="Email"></v-text-field>
+              <v-text-field v-model="localEmployee.email" label="Email" required></v-text-field>
+            </v-col>
+            <v-col cols="12" sm="6" md="4">
+              <v-text-field v-model="localEmployee.password" label="Password" type="password" required></v-text-field>
+            </v-col>
+            <v-col cols="12" sm="6" md="4">
+              <v-select v-model="localEmployee.role" :items="roles" label="Role" required></v-select>
             </v-col>
           </v-row>
         </v-container>
@@ -50,8 +56,11 @@ export default {
         name: '',
         position: '',
         salary: '',
-        email: ''
-      }
+        email: '',
+        password: '',  // Add the password field here
+        role: ''
+      },
+      roles: ['employee', 'manager']
     };
   },
   watch: {
