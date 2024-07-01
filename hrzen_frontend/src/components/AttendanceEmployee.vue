@@ -30,7 +30,7 @@
           { text: 'Date', value: 'date', align: 'start', sortable: true },
           { text: 'Status', value: 'status', align: 'start', sortable: true },
         ],
-        employeeId: 1, // Assume employee is logged in with ID 1
+        employeeId: 1,
       };
     },
     created() {

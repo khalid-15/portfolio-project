@@ -13,9 +13,8 @@
       hide-details
       class="mx-4"
     ></v-text-field>
-    <v-btn v-if="!isAuthenticated" text to="/login">Login</v-btn>
-    <v-btn v-if="!isAuthenticated" text to="/register">Register</v-btn>
-    <v-btn v-if="isAuthenticated" text @click="logout">Logout</v-btn>
+    <v-btn class="custom-btn" @click="goToLogin">Login</v-btn>
+    <v-btn class="custom-btn" @click="goToRegister">Register</v-btn>
   </v-app-bar>
 </template>
 
@@ -27,20 +26,28 @@ export default {
       search: ''
     };
   },
-  computed: {
-    isAuthenticated() {
-      return !!localStorage.getItem('token');
-    }
-  },
   methods: {
-    logout() {
-      localStorage.removeItem('token');
-      localStorage.removeItem('role');
-      this.$router.push('/login');
+    goToLogin() {
+      this.$router.push({ name: 'Login' });
+    },
+    goToRegister() {
+      this.$router.push({ name: 'Register' });
     }
   }
 };
 </script>
 
 <style scoped>
+.custom-btn {
+  margin-left: 10px;
+  background-color: #1976D2;
+  color: white;
+  border-radius: 8px;
+  padding: 0 16px;
+  transition: background-color 0.3s;
+}
+
+.custom-btn:hover {
+  background-color: #1565C0;
+}
 </style>
