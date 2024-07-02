@@ -35,9 +35,6 @@ class Attendance(db.Model):
     status = db.Column(db.String(50), nullable=False)
     employee = db.relationship('Employee', backref=db.backref('attendance', lazy=True))
 
-db.drop_all()
-db.create_all()
-
 @app.route('/register', methods=['POST'])
 def register():
     data = request.json
@@ -67,60 +64,12 @@ def login():
         return jsonify({'token': token, 'role': user.role}), 200
     return jsonify({'message': 'Invalid credentials'}), 401
 
-# @app.route('/api/employees', methods=['GET'])
-# def get_employees():
-#     employees = Employee.query.all()
-#     return jsonify([{
-#         'id': emp.id, 'name': emp.name, 'position': emp.position, 'salary': emp.salary, 'email': emp.email, 'role': emp.role
-#     } for emp in employees])
-
 @app.route('/api/employees', methods=['GET'])
 def get_employees():
     employees = Employee.query.filter(Employee.role != 'manager').all()
     return jsonify([{
         'id': emp.id, 'name': emp.name, 'position': emp.position, 'salary': emp.salary, 'email': emp.email, 'role': emp.role
     } for emp in employees])
-
-# @app.route('/api/employees', methods=['POST'])
-# def add_employee():
-#     data = request.json
-#     if 'name' not in data or 'email' not in data:
-#         return jsonify({'message': 'Name and Email are required'}), 400
-
-#     hashed_password = generate_password_hash(data['password'], method='sha256')
-#     new_employee = Employee(name=data['name'], position=data['position'], salary=data['salary'], email=data['email'], role=data['role'], password=hashed_password)
-#     try:
-#         db.session.add(new_employee)
-#         db.session.commit()
-#         return jsonify({'message': 'Employee added successfully'}), 201
-#     except IntegrityError:
-#         db.session.rollback()
-#         return jsonify({'message': 'Employee with this email already exists'}), 400
-
-# @app.route('/api/employees', methods=['POST'])
-# def add_employee():
-    data = request.json
-    required_fields = ['name', 'email', 'role', 'password']
-    for field in required_fields:
-        if field not in data:
-            return jsonify({'message': f'{field} is required'}), 400
-
-    hashed_password = generate_password_hash(data['password'], method='sha256')
-    new_employee = Employee(
-        name=data['name'],
-        position=data.get('position', ''),
-        salary=data.get('salary', 0),
-        email=data['email'],
-        role=data['role'],
-        password=hashed_password
-    )
-    try:
-        db.session.add(new_employee)
-        db.session.commit()
-        return jsonify({'message': 'Employee added successfully'}), 201
-    except IntegrityError:
-        db.session.rollback()
-        return jsonify({'message': 'Employee with this email already exists'}), 400
 
 @app.route('/api/employees', methods=['POST'])
 def add_employee():
@@ -146,7 +95,18 @@ def add_employee():
     except IntegrityError:
         db.session.rollback()
         return jsonify({'message': 'Employee with this email already exists'}), 400
-    
+
+@app.route('/change-password', methods=['POST'])
+def change_password():
+    data = request.json
+    user_id = jwt.decode(data['token'], app.config['SECRET_KEY'], algorithms=["HS256"])['id']
+    user = Employee.query.get(user_id)
+    if user and check_password_hash(user.password, data['current_password']):
+        user.password = generate_password_hash(data['new_password'], method='sha256')
+        db.session.commit()
+        return jsonify({'message': 'Password changed successfully'}), 200
+    return jsonify({'message': 'Invalid credentials'}), 401
+
 @app.route('/api/employees/<int:id>', methods=['PUT'])
 def update_employee(id):
     data = request.json
@@ -258,4 +218,6 @@ def home():
     return jsonify(message="Welcome to HRZen")
 
 if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
     app.run(debug=True)
