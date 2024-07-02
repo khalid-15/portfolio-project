@@ -8,6 +8,7 @@ import AttendanceEmployee from '@/components/AttendanceEmployee.vue';
 import AttendanceHR from '@/components/AttendanceHR.vue';
 import Login from '@/components/UserLogin.vue';
 import Register from '@/components/UserRegister.vue';
+import ProfilePage from '@/components/ProfilePage.vue';
 
 const routes = [
   {
@@ -20,6 +21,7 @@ const routes = [
       { path: 'attendance/hr', name: 'AttendanceHR', component: AttendanceHR, meta: { requiresAuth: true, role: 'manager' } },
       { path: 'calendar', name: 'HRCalendar', component: HRCalendar, meta: { requiresAuth: true } },
       { path: 'payroll', name: 'HRPayroll', component: HRPayroll, meta: { requiresAuth: true, role: 'manager' } },
+      { path: 'profile', name: 'Profile', component: ProfilePage, meta: { requiresAuth: true } },
     ],
   },
   { path: '/login', name: 'Login', component: Login },

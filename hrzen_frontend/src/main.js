@@ -8,6 +8,7 @@ import 'vue-toast-notification/dist/theme-sugar.css';
 import VCalendar from 'v-calendar';
 import 'v-calendar/style.css'; 
 
+
 loadFonts();
 
 const app = createApp(App);
@@ -18,3 +19,4 @@ app.use(ToastPlugin);
 app.use(VCalendar, {}); 
 
 app.mount('#app');
+
