@@ -43,6 +43,7 @@ def token_required(f):
         if not token:
             return jsonify({'message': 'Token is missing!'}), 403
         try:
+            token = token.split()[1]
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
             current_user = Employee.query.filter_by(id=data['id']).first()
         except:
@@ -54,6 +55,9 @@ def token_required(f):
 @app.route('/register', methods=['POST'])
 def register():
     data = request.json
+    if not data or not data.get('email') or not data.get('password'):
+        return jsonify({'message': 'Email and password are required'}), 400
+    
     hashed_password = generate_password_hash(data['password'], method='sha256')
     new_user = Employee(
         name=data['name'],
@@ -74,6 +78,9 @@ def register():
 @app.route('/login', methods=['POST'])
 def login():
     data = request.json
+    if not data or not data.get('email') or not data.get('password'):
+        return jsonify({'message': 'Email and password are required'}), 400
+
     user = Employee.query.filter_by(email=data['email']).first()
     if user and check_password_hash(user.password, data['password']):
         token = jwt.encode({'id': user.id, 'exp': datetime.utcnow() + timedelta(hours=24)}, app.config['SECRET_KEY'])
@@ -83,7 +90,7 @@ def login():
 @app.route('/change-password', methods=['POST'])
 def change_password():
     data = request.json
-    user_id = jwt.decode(data['token'], app.config['SECRET_KEY'], algorithms=["HS256"])['id']
+    user_id = jwt.decode(data['token'].split()[1], app.config['SECRET_KEY'], algorithms=["HS256"])['id']
     user = Employee.query.get(user_id)
     if user and check_password_hash(user.password, data['current_password']):
         user.password = generate_password_hash(data['new_password'], method='sha256')
@@ -93,14 +100,19 @@ def change_password():
 
 @app.route('/api/employees', methods=['GET'])
 @token_required
-def get_employees():
+def get_employees(current_user):
+    if current_user.role != 'manager':
+        return jsonify({'message': 'Permission denied!'}), 403
     employees = Employee.query.filter(Employee.role != 'manager').all()
     return jsonify([{
         'id': emp.id, 'name': emp.name, 'position': emp.position, 'salary': emp.salary, 'email': emp.email, 'role': emp.role
     } for emp in employees])
 
 @app.route('/api/employees', methods=['POST'])
-def add_employee():
+@token_required
+def add_employee(current_user):
+    if current_user.role != 'manager':
+        return jsonify({'message': 'Permission denied!'}), 403
     data = request.json
     required_fields = ['name', 'email', 'role', 'password']
     for field in required_fields:
@@ -127,7 +139,10 @@ def add_employee():
 
 
 @app.route('/api/employees/<int:id>', methods=['PUT'])
-def update_employee(id):
+@token_required
+def update_employee(current_user, id):
+    if current_user.role != 'manager':
+        return jsonify({'message': 'Permission denied!'}), 403
     data = request.json
     employee = Employee.query.get(id)
     if employee:
@@ -143,7 +158,10 @@ def update_employee(id):
     return jsonify({'message': 'Employee not found'}), 404
 
 @app.route('/api/employees/<int:id>', methods=['DELETE'])
-def delete_employee(id):
+@token_required
+def delete_employee(current_user, id):
+    if current_user.role != 'manager':
+        return jsonify({'message': 'Permission denied!'}), 403
     employee = Employee.query.get(id)
     if employee:
         db.session.delete(employee)
@@ -152,14 +170,16 @@ def delete_employee(id):
     return jsonify({'message': 'Employee not found'}), 404
 
 @app.route('/api/events', methods=['GET'])
-def get_events():
+@token_required
+def get_events(current_user):
     events = Event.query.all()
     return jsonify([{
         'id': event.id, 'title': event.title, 'date': event.date.strftime('%Y-%m-%d')
     } for event in events])
 
 @app.route('/api/events', methods=['POST'])
-def add_event():
+@token_required
+def add_event(current_user):
     data = request.json
     try:
         date = datetime.strptime(data['date'], '%Y-%m-%dT%H:%M:%S.%fZ').date()
@@ -171,7 +191,8 @@ def add_event():
     return jsonify({'message': 'Event added successfully'}), 201
 
 @app.route('/api/events/<int:id>', methods=['PUT'])
-def update_event(id):
+@token_required
+def update_event(current_user, id):
     data = request.json
     event = Event.query.get(id)
     if event:
@@ -185,7 +206,8 @@ def update_event(id):
     return jsonify({'message': 'Event not found'}), 404
 
 @app.route('/api/events/<int:id>', methods=['DELETE'])
-def delete_event(id):
+@token_required
+def delete_event(current_user, id):
     event = Event.query.get(id)
     if event:
         db.session.delete(event)
@@ -193,8 +215,10 @@ def delete_event(id):
         return jsonify({'message': 'Event deleted successfully'})
     return jsonify({'message': 'Event not found'}), 404
 
+
 @app.route('/api/attendance', methods=['GET'])
-def get_attendance():
+@token_required
+def get_attendance(current_user):
     attendance_records = Attendance.query.join(Employee).all()
     return jsonify([{
         'id': record.id,
@@ -205,7 +229,8 @@ def get_attendance():
     } for record in attendance_records])
 
 @app.route('/api/attendance', methods=['POST'])
-def add_attendance():
+@token_required
+def add_attendance(current_user):
     data = request.json
     new_attendance = Attendance(employee_id=data['employee_id'], date=datetime.strptime(data['date'], '%Y-%m-%d').date(), status=data['status'])
     db.session.add(new_attendance)
@@ -213,7 +238,8 @@ def add_attendance():
     return jsonify({'message': 'Attendance added successfully'}), 201
 
 @app.route('/api/attendance/<int:id>', methods=['PUT'])
-def update_attendance(id):
+@token_required
+def update_attendance(current_user, id):
     data = request.json
     attendance = Attendance.query.get(id)
     if attendance:
@@ -224,7 +250,8 @@ def update_attendance(id):
     return jsonify({'message': 'Attendance not found'}), 404
 
 @app.route('/api/attendance/<int:id>', methods=['DELETE'])
-def delete_attendance(id):
+@token_required
+def delete_attendance(current_user, id):
     attendance = Attendance.query.get(id)
     if attendance:
         db.session.delete(attendance)
