@@ -74,39 +74,76 @@ export default {
     this.fetchEmployees();
   },
   methods: {
+    // fetchEmployees() {
+    //   axios.get('http://localhost:5000/api/employees')
+    //     .then(response => {
+    //       this.employees = response.data;
+    //     })
+    //     .catch(error => {
+    //       console.error("There was an error fetching the employees!", error);
+    //     });
+    // },
     fetchEmployees() {
-      axios.get('http://localhost:5000/api/employees')
-        .then(response => {
-          this.employees = response.data;
-        })
-        .catch(error => {
-          console.error("There was an error fetching the employees!", error);
-        });
+  const token = localStorage.getItem('token');
+  axios.get('http://localhost:5000/api/employees', {
+    headers: {
+      'Authorization': `Bearer ${token}`
+      }
+    })
+    .then(response => {
+      this.employees = response.data;
+    })
+    .catch(error => {
+      console.error("There was an error fetching the employees!", error);
+    });
     },
+
     showAddEmployeeDialog() {
       this.addDialog = true;
     },
+
     showEditEmployeeDialog(employee) {
       this.selectedEmployee = { ...employee };
       this.editDialog = true;
     },
+
     confirmDeleteEmployee(id) {
       this.employeeToDelete = id;
       this.confirmDeleteDialog = true;
     },
+
     deleteEmployee() {
-      const toast = useToast();
-      axios.delete(`http://localhost:5000/api/employees/${this.employeeToDelete}`)
-        .then(() => {
-          this.fetchEmployees();
-          this.confirmDeleteDialog = false;
-          toast.success('Employee deleted successfully!');
-        })
-        .catch(error => {
-          toast.error('There was an error deleting the employee!');
-          console.error("There was an error deleting the employee!", error);
-        });
+  const toast = useToast();
+  const token = localStorage.getItem('token');
+  axios.delete(`http://localhost:5000/api/employees/${this.employeeToDelete}`, {
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+    })
+    .then(() => {
+      this.fetchEmployees();
+      this.confirmDeleteDialog = false;
+      toast.success('Employee deleted successfully!');
+    })
+    .catch(error => {
+      toast.error('There was an error deleting the employee!');
+      console.error("There was an error deleting the employee!", error);
+    });
     },
+    // deleteEmployee() {
+    //   const toast = useToast();
+    //   axios.delete(`http://localhost:5000/api/employees/${this.employeeToDelete}`)
+    //     .then(() => {
+    //       this.fetchEmployees();
+    //       this.confirmDeleteDialog = false;
+    //       toast.success('Employee deleted successfully!');
+    //     })
+    //     .catch(error => {
+    //       toast.error('There was an error deleting the employee!');
+    //       console.error("There was an error deleting the employee!", error);
+    //     });
+    // },
+
     downloadEmployees() {
       axios.get('http://localhost:5000/api/employees')
         .then(response => {

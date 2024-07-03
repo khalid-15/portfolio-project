@@ -69,18 +69,37 @@ export default {
       this.localDialog = false;
     },
     updateEmployee() {
-      const toast = useToast();
-      axios.put(`http://localhost:5000/api/employees/${this.localEmployee.id}`, this.localEmployee)
-        .then(() => {
-          this.$emit('employee-updated');
-          toast.success('Employee updated successfully!');
-          this.closeDialog();
-        })
-        .catch(error => {
-          toast.error('There was an error updating the employee!');
-          console.error("There was an error updating the employee!", error);
-        });
+  const toast = useToast();
+  const token = localStorage.getItem('token');
+  axios.put(`http://localhost:5000/api/employees/${this.localEmployee.id}`, this.localEmployee, {
+    headers: {
+      'Authorization': `Bearer ${token}`
     }
+  })
+    .then(() => {
+      this.$emit('employee-updated');
+      toast.success('Employee updated successfully!');
+      this.closeDialog();
+    })
+    .catch(error => {
+      toast.error('There was an error updating the employee!');
+      console.error("There was an error updating the employee!", error);
+    });
+  }
+  
+    // updateEmployee() {
+    //   const toast = useToast();
+    //   axios.put(`http://localhost:5000/api/employees/${this.localEmployee.id}`, this.localEmployee)
+    //     .then(() => {
+    //       this.$emit('employee-updated');
+    //       toast.success('Employee updated successfully!');
+    //       this.closeDialog();
+    //     })
+    //     .catch(error => {
+    //       toast.error('There was an error updating the employee!');
+    //       console.error("There was an error updating the employee!", error);
+    //     });
+    // }
   }
 };
 </script>

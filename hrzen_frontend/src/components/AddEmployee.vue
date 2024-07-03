@@ -75,18 +75,40 @@ export default {
     closeDialog() {
       this.localDialog = false;
     },
-    saveEmployee() {
-      const toast = useToast();
-      axios.post('http://localhost:5000/api/employees', this.localEmployee)
-        .then(() => {
-          this.$emit('employee-added');
-          this.closeDialog();
-          toast.success('Employee added successfully!');
-        })
-        .catch(error => {
-          toast.error('There was an error adding the employee!');
-          console.error("There was an error adding the employee!", error);
-        });
+    // saveEmployee() {
+    //   const toast = useToast();
+    //   axios.post('http://localhost:5000/api/employees', this.localEmployee)
+    //     .then(() => {
+    //       this.$emit('employee-added');
+    //       this.closeDialog();
+    //       toast.success('Employee added successfully!');
+    //     })
+    //     .catch(error => {
+    //       toast.error('There was an error adding the employee!');
+    //       console.error("There was an error adding the employee!", error);
+    //     });
+    // }
+  saveEmployee() {
+  const toast = useToast();
+  const token = localStorage.getItem('token');
+  axios.post('http://localhost:5000/api/employees', this.localEmployee, {
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  })
+    .then(() => {
+      this.$emit('employee-added');
+      this.closeDialog();
+      toast.success('Employee added successfully!');
+    })
+    .catch(error => {
+      if (error.response && error.response.status === 400) {
+        toast.error('User with this email already exists');
+      } else {
+        toast.error('There was an error adding the employee!');
+      }
+      console.error("There was an error adding the employee!", error);
+    });
     }
   }
 };
