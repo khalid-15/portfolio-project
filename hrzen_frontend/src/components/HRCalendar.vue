@@ -76,9 +76,23 @@ export default {
     const eventIdToDelete = ref(null);
     const toast = useToast();
 
+    // const fetchEvents = async () => {
+    //   try {
+    //     const response = await axios.get('http://localhost:5000/api/events');
+    //     events.value = response.data;
+    //   } catch (error) {
+    //     toast.error('Failed to fetch events');
+    //   }
+    // };
+
     const fetchEvents = async () => {
+      const token = localStorage.getItem('token');
       try {
-        const response = await axios.get('http://localhost:5000/api/events');
+        const response = await axios.get('http://localhost:5000/api/events', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
         events.value = response.data;
       } catch (error) {
         toast.error('Failed to fetch events');
@@ -100,8 +114,13 @@ export default {
     };
 
     const deleteEvent = async () => {
+      const token = localStorage.getItem('token');
       try {
-        await axios.delete(`http://localhost:5000/api/events/${eventIdToDelete.value}`);
+        await axios.delete(`http://localhost:5000/api/events/${eventIdToDelete.value}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
         toast.success('Event deleted successfully');
         fetchEvents();
         closeDeleteDialog();
@@ -109,6 +128,17 @@ export default {
         toast.error('Failed to delete event');
       }
     };
+
+    // const deleteEvent = async () => {
+    //   try {
+    //     await axios.delete(`http://localhost:5000/api/events/${eventIdToDelete.value}`);
+    //     toast.success('Event deleted successfully');
+    //     fetchEvents();
+    //     closeDeleteDialog();
+    //   } catch (error) {
+    //     toast.error('Failed to delete event');
+    //   }
+    // };
 
     const closeDeleteDialog = () => {
       deleteDialog.value = false;

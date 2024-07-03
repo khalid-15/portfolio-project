@@ -50,6 +50,7 @@ export default {
     const toast = useToast();
 
     const updateEvent = async () => {
+      const token = localStorage.getItem('token');
       if (!localEvent.value.title || !localEvent.value.date) {
         toast.error('Please fill in all fields');
         return;
@@ -59,6 +60,10 @@ export default {
         await axios.put(`http://localhost:5000/api/events/${localEvent.value.id}`, {
           title: localEvent.value.title,
           date: localEvent.value.date.toISOString().split('T')[0]
+        }, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
         });
         toast.success('Event updated successfully');
         emit('event-updated');

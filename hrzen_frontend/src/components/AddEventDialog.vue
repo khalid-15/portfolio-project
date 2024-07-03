@@ -48,7 +48,27 @@ export default {
     });
     const toast = useToast();
 
+    // const saveEvent = async () => {
+    //   if (!event.value.title || !event.value.date) {
+    //     toast.error('Please fill in all fields');
+    //     return;
+    //   }
+
+    //   try {
+    //     await axios.post('http://localhost:5000/api/events', {
+    //       title: event.value.title,
+    //       date: event.value.date.toISOString()
+    //     });
+    //     toast.success('Event added successfully');
+    //     emit('event-added');
+    //     close();
+    //   } catch (error) {
+    //     toast.error('Failed to add event');
+    //   }
+    // };
+
     const saveEvent = async () => {
+      const token = localStorage.getItem('token');
       if (!event.value.title || !event.value.date) {
         toast.error('Please fill in all fields');
         return;
@@ -58,6 +78,10 @@ export default {
         await axios.post('http://localhost:5000/api/events', {
           title: event.value.title,
           date: event.value.date.toISOString()
+        }, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
         });
         toast.success('Event added successfully');
         emit('event-added');
@@ -66,7 +90,7 @@ export default {
         toast.error('Failed to add event');
       }
     };
-
+    
     const close = () => {
       emit('update:dialog', false);
       event.value = { title: '', date: null };
