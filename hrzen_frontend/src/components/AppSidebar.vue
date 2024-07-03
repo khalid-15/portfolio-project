@@ -1,7 +1,15 @@
 <template>
   <v-navigation-drawer app v-model="drawerInternal" permanent>
     <v-list dense>
-      <v-list-item to="/employees" router v-if="isLoggedIn">
+      <v-list-item to="/" router>
+        <v-list-item-icon>
+          <v-icon color="primary">mdi-home</v-icon>
+        </v-list-item-icon>
+        <v-list-item-content>
+          <v-list-item-title>Home</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+      <v-list-item v-if="isManager" to="/employees" router>
         <v-list-item-icon>
           <v-icon color="primary">mdi-account</v-icon>
         </v-list-item-icon>
@@ -9,15 +17,23 @@
           <v-list-item-title>Employees</v-list-item-title>
         </v-list-item-content>
       </v-list-item>
-      <v-list-item to="/attendance" router v-if="isLoggedIn">
+      <v-list-item v-if="isManager" to="/attendance/hr" router>
         <v-list-item-icon>
           <v-icon color="primary">mdi-checkbox-marked-circle-outline</v-icon>
         </v-list-item-icon>
         <v-list-item-content>
-          <v-list-item-title>Attendance</v-list-item-title>
+          <v-list-item-title>Attendance (HR)</v-list-item-title>
         </v-list-item-content>
       </v-list-item>
-      <v-list-item to="/calendar" router v-if="isLoggedIn">
+      <v-list-item v-if="isEmployee" to="/attendance" router>
+        <v-list-item-icon>
+          <v-icon color="primary">mdi-checkbox-marked-circle-outline</v-icon>
+        </v-list-item-icon>
+        <v-list-item-content>
+          <v-list-item-title>My Attendance</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+      <v-list-item to="/calendar" router>
         <v-list-item-icon>
           <v-icon color="primary">mdi-calendar</v-icon>
         </v-list-item-icon>
@@ -25,7 +41,7 @@
           <v-list-item-title>Calendar</v-list-item-title>
         </v-list-item-content>
       </v-list-item>
-      <v-list-item to="/payroll" router v-if="isLoggedIn">
+      <v-list-item v-if="isManager" to="/payroll" router>
         <v-list-item-icon>
           <v-icon color="primary">mdi-cash</v-icon>
         </v-list-item-icon>
@@ -47,9 +63,6 @@ export default {
     }
   },
   computed: {
-    isLoggedIn() {
-      return !!localStorage.getItem('token');
-    },
     drawerInternal: {
       get() {
         return this.drawer;
@@ -57,7 +70,16 @@ export default {
       set(value) {
         this.$emit('update-drawer', value);
       }
+    },
+    isManager() {
+      return localStorage.getItem('role') === 'manager';
+    },
+    isEmployee() {
+      return localStorage.getItem('role') === 'employee';
     }
   }
 };
 </script>
+
+<style scoped>
+</style>
