@@ -11,11 +11,11 @@
       <v-data-table
         :headers="headers"
         :items="attendanceRecords"
-        height="400"
         class="elevation-1"
+        height="400"
       >
         <template v-slot:[`item.actions`]="{ item }">
-          <v-icon small @click="confirmDeleteAttendance(item.id)">mdi-delete</v-icon>
+          <v-icon small color="red" @click="confirmDeleteAttendance(item.id)">mdi-delete</v-icon>
         </template>
       </v-data-table>
     </v-card>
@@ -130,12 +130,11 @@ export default {
 </script>
 
 <style scoped>
+.v-card-title {
+  background-color: #3F51B5;
+  color: white;
+}
 .v-btn {
   margin-right: 8px;
-}
-
-.v-card-title {
-  background-color: #E8EAF6;
-  color: black;
 }
 </style>

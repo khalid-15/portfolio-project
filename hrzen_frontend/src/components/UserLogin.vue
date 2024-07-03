@@ -1,13 +1,17 @@
 <template>
   <v-container class="d-flex justify-center align-center login-register-container">
     <v-card class="pa-5" width="400">
-      <v-card-title>Login</v-card-title>
+      <v-card-title class="headline">Login</v-card-title>
       <v-card-text>
         <v-form>
           <v-text-field label="Email" v-model="email" required></v-text-field>
           <v-text-field label="Password" v-model="password" type="password" required></v-text-field>
-          <v-btn class="custom-btn" @click="login">Login</v-btn>
+          <v-btn class="custom-btn mt-4" @click="login">Login</v-btn>
         </v-form>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn text @click="redirectToRegister">Don't have an account? Register</v-btn>
+        </v-card-actions>
       </v-card-text>
     </v-card>
   </v-container>
@@ -44,6 +48,9 @@ export default {
         useToast().error('Login failed!');
         console.error('Login failed:', error);
       }
+    },
+    redirectToRegister() {
+      this.$router.push({ name: 'Register' });
     }
   }
 };

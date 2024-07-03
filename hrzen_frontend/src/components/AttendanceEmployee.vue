@@ -11,8 +11,7 @@
         :items="attendanceRecords"
         height="400"
         class="elevation-1"
-      >
-      </v-data-table>
+      />
     </v-card>
   </v-container>
 </template>
@@ -79,12 +78,11 @@ export default {
 </script>
 
 <style scoped>
+.v-card-title {
+  background-color: #3F51B5;
+  color: white;
+}
 .v-btn {
   margin-right: 8px;
-}
-
-.v-card-title {
-  background-color: #E8EAF6;
-  color: black;
 }
 </style>
