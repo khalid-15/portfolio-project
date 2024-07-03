@@ -31,7 +31,18 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
+  scrollBehavior(to, from, savedPosition) { // eslint-disable-line no-unused-vars
+    if (to.hash) {
+      return {
+        el: to.hash,
+        behavior: 'smooth',
+      };
+    }
+    return { top: 0, behavior: 'smooth' };
+  },
 });
+
+
 
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token');

@@ -5,14 +5,9 @@
     </v-btn>
     <v-toolbar-title>HRZen</v-toolbar-title>
     <v-spacer></v-spacer>
-    <v-text-field
-      v-model="search"
-      append-icon="mdi-magnify"
-      label="Search"
-      single-line
-      hide-details
-      class="mx-4"
-    ></v-text-field>
+    <v-btn class="custom-btn" @click="goToSection('#home')">Home</v-btn>
+    <v-btn class="custom-btn" @click="goToSection('#features')">Features</v-btn>
+    <v-btn class="custom-btn" @click="goToSection('#about')">About</v-btn>
     <v-btn class="custom-btn" @click="goToLogin">Login</v-btn>
     <v-btn class="custom-btn" @click="goToRegister">Register</v-btn>
   </v-app-bar>
@@ -21,12 +16,10 @@
 <script>
 export default {
   name: 'AppNavbar',
-  data() {
-    return {
-      search: ''
-    };
-  },
   methods: {
+    goToSection(sectionId) {
+      this.$router.push({ path: '/', hash: sectionId });
+    },
     goToLogin() {
       this.$router.push({ name: 'Login' });
     },
