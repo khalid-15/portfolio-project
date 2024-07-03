@@ -5,42 +5,49 @@
     </v-btn>
     <v-toolbar-title>HRZen</v-toolbar-title>
     <v-spacer></v-spacer>
-    <v-btn class="custom-btn" @click="goToSection('#home')">Home</v-btn>
-    <v-btn class="custom-btn" @click="goToSection('#features')">Features</v-btn>
-    <v-btn class="custom-btn" @click="goToSection('#about')">About</v-btn>
-    <v-btn class="custom-btn" @click="goToLogin">Login</v-btn>
-    <v-btn class="custom-btn" @click="goToRegister">Register</v-btn>
+    <v-btn class="custom-btn" @click="goToHome">Home</v-btn>
+    <v-btn class="custom-btn" @click="goToFeatures">Features</v-btn>
+    <v-btn class="custom-btn" @click="goToAbout">About</v-btn>
+    <v-btn class="custom-btn" @click="goToLogin" v-if="!isLoggedIn">Login</v-btn>
+    <v-btn class="custom-btn" @click="goToRegister" v-if="!isLoggedIn">Register</v-btn>
+    <v-btn class="custom-btn" @click="logout" v-if="isLoggedIn">Logout</v-btn>
   </v-app-bar>
 </template>
 
 <script>
 export default {
   name: 'AppNavbar',
+  data() {
+    return {
+      search: ''
+    };
+  },
+  computed: {
+    isLoggedIn() {
+      return !!localStorage.getItem('token');
+    }
+  },
   methods: {
-    goToSection(sectionId) {
-      this.$router.push({ path: '/', hash: sectionId });
+    goToHome() {
+      this.$router.push({ name: 'HomePage' });
+    },
+    goToFeatures() {
+      this.$router.push({ path: '/', hash: '#features' });
+    },
+    goToAbout() {
+      this.$router.push({ path: '/', hash: '#about' });
     },
     goToLogin() {
       this.$router.push({ name: 'Login' });
     },
     goToRegister() {
       this.$router.push({ name: 'Register' });
+    },
+    logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('role');
+      this.$router.push({ name: 'HomePage' });
     }
   }
 };
 </script>
-
-<style scoped>
-.custom-btn {
-  margin-left: 10px;
-  background-color: #1976D2;
-  color: white;
-  border-radius: 8px;
-  padding: 0 16px;
-  transition: background-color 0.3s;
-}
-
-.custom-btn:hover {
-  background-color: #1565C0;
-}
-</style>

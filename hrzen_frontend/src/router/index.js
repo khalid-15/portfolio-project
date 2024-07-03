@@ -48,16 +48,17 @@ router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token');
   const userRole = localStorage.getItem('role');
   if (to.matched.some(record => record.meta.requiresAuth)) {
-    if (!token) {
-      next({ name: 'Login' });
-    } else if (to.meta.role && to.meta.role !== userRole) {
-      next({ name: 'HomePage' });
-    } else {
-      next();
-    }
+      if (!token) {
+          next({ name: 'Login' });
+      } else if (to.meta.role && to.meta.role !== userRole) {
+          next({ name: 'HomePage' });
+      } else {
+          next();
+      }
   } else {
-    next();
+      next();
   }
 });
+
 
 export default router;
