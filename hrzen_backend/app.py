@@ -5,6 +5,7 @@ from flask_cors import CORS
 from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
+from functools import wraps
 
 app = Flask(__name__)
 CORS(app)
@@ -35,6 +36,21 @@ class Attendance(db.Model):
     status = db.Column(db.String(50), nullable=False)
     employee = db.relationship('Employee', backref=db.backref('attendance', lazy=True))
 
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = request.headers.get('Authorization')
+        if not token:
+            return jsonify({'message': 'Token is missing!'}), 403
+        try:
+            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+            current_user = Employee.query.filter_by(id=data['id']).first()
+        except:
+            return jsonify({'message': 'Token is invalid!'}), 403
+        return f(current_user, *args, **kwargs)
+    return decorated
+
+
 @app.route('/register', methods=['POST'])
 def register():
     data = request.json
@@ -64,7 +80,19 @@ def login():
         return jsonify({'token': token, 'role': user.role}), 200
     return jsonify({'message': 'Invalid credentials'}), 401
 
+@app.route('/change-password', methods=['POST'])
+def change_password():
+    data = request.json
+    user_id = jwt.decode(data['token'], app.config['SECRET_KEY'], algorithms=["HS256"])['id']
+    user = Employee.query.get(user_id)
+    if user and check_password_hash(user.password, data['current_password']):
+        user.password = generate_password_hash(data['new_password'], method='sha256')
+        db.session.commit()
+        return jsonify({'message': 'Password changed successfully'}), 200
+    return jsonify({'message': 'Invalid credentials'}), 401
+
 @app.route('/api/employees', methods=['GET'])
+@token_required
 def get_employees():
     employees = Employee.query.filter(Employee.role != 'manager').all()
     return jsonify([{
@@ -96,16 +124,7 @@ def add_employee():
         db.session.rollback()
         return jsonify({'message': 'Employee with this email already exists'}), 400
 
-@app.route('/change-password', methods=['POST'])
-def change_password():
-    data = request.json
-    user_id = jwt.decode(data['token'], app.config['SECRET_KEY'], algorithms=["HS256"])['id']
-    user = Employee.query.get(user_id)
-    if user and check_password_hash(user.password, data['current_password']):
-        user.password = generate_password_hash(data['new_password'], method='sha256')
-        db.session.commit()
-        return jsonify({'message': 'Password changed successfully'}), 200
-    return jsonify({'message': 'Invalid credentials'}), 401
+
 
 @app.route('/api/employees/<int:id>', methods=['PUT'])
 def update_employee(id):
