@@ -1,3 +1,4 @@
+import os
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
@@ -10,10 +11,17 @@ from functools import wraps
 app = Flask(__name__)
 CORS(app)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///hrzen.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'postgresql://hrzen_database_user:GS7xPgJYd9c2s1hEchjWpeSChADTYOQA@dpg-cq3fmjaju9rs739eaf6g-a.oregon-postgres.render.com/hrzen_database')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = 'your_secret_key'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', '980f62122762665d538c9a5a13276023')
 db = SQLAlchemy(app)
+
+
+
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///hrzen.db'
+# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# app.config['SECRET_KEY'] = 'your_secret_key'
+# db = SQLAlchemy(app)
 
 class Employee(db.Model):
     id = db.Column(db.Integer, primary_key=True)
