@@ -4,7 +4,7 @@
       <v-card-title class="d-flex flex-row mb-6">
         Attendance Records
         <v-spacer></v-spacer>
-        <v-btn @click="downloadEmployees" class="download-employee-btn">Download Employees</v-btn>
+        <v-btn @click="downloadEmployees" class="download-employee-btn">Download Attendance</v-btn>
       </v-card-title>
       <v-data-table
         :headers="headers"
