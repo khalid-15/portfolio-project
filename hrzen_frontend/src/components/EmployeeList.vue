@@ -4,7 +4,7 @@
       <v-card-title class="d-flex flex-row mb-6">
         Employees
         <v-spacer></v-spacer>
-        <v-btn @click="showAddEmployeeDialog"  class="add-employee-btn mr-2">Add Employee</v-btn>
+        <v-btn @click="showAddEmployeeDialog" class="add-employee-btn mr-2">Add Employee</v-btn>
         <v-btn @click="downloadEmployees" class="download-employee-btn">Download Employees</v-btn>
       </v-card-title>
       <v-card-text>
@@ -15,8 +15,8 @@
           class="elevation-1"
         >
           <template v-slot:[`item.actions`]="{ item }">
-            <v-icon small color="#1B263B" class="mr-2" @click="showEditEmployeeDialog(item)">mdi-pencil</v-icon>
-            <v-icon small color="red" @click="confirmDeleteEmployee(item.id)">mdi-delete</v-icon>
+            <v-icon small color="accent" class="mr-2" @click="showEditEmployeeDialog(item)">mdi-pencil</v-icon>
+            <v-icon small color="error" @click="confirmDeleteEmployee(item.id)">mdi-delete</v-icon>
           </template>
         </v-data-table>
       </v-card-text>
@@ -32,8 +32,8 @@
         <v-card-text>Are you sure you want to delete this employee?</v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="red darken-1" text @click="confirmDeleteDialog = false">Cancel</v-btn>
-          <v-btn color="green darken-1" text @click="deleteEmployee">Confirm</v-btn>
+          <v-btn color="error" text @click="confirmDeleteDialog = false">Cancel</v-btn>
+          <v-btn color="success" text @click="deleteEmployee">Confirm</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -56,7 +56,7 @@ export default {
     return {
       employees: [],
       headers: [
-      { title: 'Name', value: 'name', align: 'start', sortable: true },
+        { title: 'Name', value: 'name', align: 'start', sortable: true },
         { title: 'Position', value: 'position', align: 'start', sortable: true },
         { title: 'Salary', value: 'salary', align: 'start', sortable: true },
         { title: 'Email', value: 'email', align: 'start', sortable: true },
@@ -73,93 +73,71 @@ export default {
     this.fetchEmployees();
   },
   methods: {
-    // fetchEmployees() {
-    //   axios.get('http://localhost:5000/api/employees')
-    //     .then(response => {
-    //       this.employees = response.data;
-    //     })
-    //     .catch(error => {
-    //       console.error("There was an error fetching the employees!", error);
-    //     });
-    // },
     fetchEmployees() {
-  const token = localStorage.getItem('token');
-  axios.get('http://localhost:5000/api/employees', {
-    headers: {
-      'Authorization': `Bearer ${token}`
-      }
-    })
-    .then(response => {
-      this.employees = response.data;
-    })
-    .catch(error => {
-      console.error("There was an error fetching the employees!", error);
-    });
+      const token = localStorage.getItem('token');
+      axios.get('http://localhost:5000/api/employees', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      .then(response => {
+        this.employees = response.data;
+      })
+      .catch(error => {
+        console.error("There was an error fetching the employees!", error);
+      });
     },
-
     showAddEmployeeDialog() {
       this.addDialog = true;
     },
-
     showEditEmployeeDialog(employee) {
       this.selectedEmployee = { ...employee };
       this.editDialog = true;
     },
-
     confirmDeleteEmployee(id) {
       this.employeeToDelete = id;
       this.confirmDeleteDialog = true;
     },
-
     deleteEmployee() {
-  const toast = useToast();
-  const token = localStorage.getItem('token');
-  axios.delete(`http://localhost:5000/api/employees/${this.employeeToDelete}`, {
-    headers: {
-      'Authorization': `Bearer ${token}`
-    }
-    })
-    .then(() => {
-      this.fetchEmployees();
-      this.confirmDeleteDialog = false;
-      toast.success('Employee deleted successfully!');
-    })
-    .catch(error => {
-      toast.error('There was an error deleting the employee!');
-      console.error("There was an error deleting the employee!", error);
-    });
+      const toast = useToast();
+      const token = localStorage.getItem('token');
+      axios.delete(`http://localhost:5000/api/employees/${this.employeeToDelete}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      .then(() => {
+        this.fetchEmployees();
+        this.confirmDeleteDialog = false;
+        toast.success('Employee deleted successfully!');
+      })
+      .catch(error => {
+        toast.error('There was an error deleting the employee!');
+        console.error("There was an error deleting the employee!", error);
+      });
     },
-    // deleteEmployee() {
-    //   const toast = useToast();
-    //   axios.delete(`http://localhost:5000/api/employees/${this.employeeToDelete}`)
-    //     .then(() => {
-    //       this.fetchEmployees();
-    //       this.confirmDeleteDialog = false;
-    //       toast.success('Employee deleted successfully!');
-    //     })
-    //     .catch(error => {
-    //       toast.error('There was an error deleting the employee!');
-    //       console.error("There was an error deleting the employee!", error);
-    //     });
-    // },
-
     downloadEmployees() {
-      axios.get('http://localhost:5000/api/employees')
-        .then(response => {
-          const csvContent = this.convertToCSV(response.data);
-          const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-          const link = document.createElement('a');
-          const url = URL.createObjectURL(blob);
-          link.setAttribute('href', url);
-          link.setAttribute('download', 'employees.csv');
-          link.style.visibility = 'hidden';
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        })
-        .catch(error => {
-          console.error(error);
-        });
+      const token = localStorage.getItem('token');
+      axios.get('http://localhost:5000/api/employees', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      .then(response => {
+        const csvContent = this.convertToCSV(response.data);
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', 'employees.csv');
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      })
+      .catch(error => {
+        console.error(error);
+      });
     },
     convertToCSV(data) {
       const header = Object.keys(data[0]).join(',');
@@ -186,5 +164,4 @@ export default {
   background-color: #E0E1DD !important;
   color: #415A77 !important;
 }
-
 </style>
