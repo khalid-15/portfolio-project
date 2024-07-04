@@ -78,7 +78,7 @@ export default {
 
 <style scoped>
 .custom-sidebar {
-  background-color: #3F51B5 !important;
+  background-color: #0D1B2A !important;
 }
 .white--text {
   color: white !important;

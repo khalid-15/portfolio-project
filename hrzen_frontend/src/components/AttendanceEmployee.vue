@@ -4,7 +4,7 @@
       <v-card-title class="d-flex flex-row mb-6">
         My Attendance Records
         <v-spacer></v-spacer>
-        <v-btn color="primary" @click="checkIn">Check In</v-btn>
+        <v-btn class="checkin-btn" @click="checkIn">Check In</v-btn>
       </v-card-title>
       <v-data-table
         :headers="headers"
@@ -79,10 +79,15 @@ export default {
 
 <style scoped>
 .v-card-title {
-  background-color: #3F51B5;
+  background-color: #415A77;
   color: white;
 }
-.v-btn {
-  margin-right: 8px;
+.checkin-btn {
+  background-color: #778DA9 !important;
+  color: white !important;
+}
+.custom-table-header .v-data-table-header {
+  background-color: #415A77 !important;
+  color: white !important;
 }
 </style>

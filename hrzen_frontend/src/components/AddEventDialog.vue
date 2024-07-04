@@ -20,8 +20,8 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
-        <v-btn color="blue darken-1" text @click="saveEvent">Add</v-btn>
+        <v-btn class="cancel-btn" text @click="close">Cancel</v-btn>
+        <v-btn class="add-btn" text @click="saveEvent">Add</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -118,3 +118,17 @@ export default {
   }
 };
 </script>
+<style scoped>
+.v-card-title {
+  background-color: #1B263B;
+  color: #E0E1DD;
+}
+.cancel-btn {
+  background-color: #E0E1DD !important;
+  color: #415A77 !important;
+}
+.add-btn {
+  background-color: #778DA9 !important;
+  color: white !important;
+}
+</style>

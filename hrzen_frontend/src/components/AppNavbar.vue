@@ -51,3 +51,13 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.custom-btn {
+  color: #E0E1DD;
+}
+
+.v-app-bar {
+  background-color: #0D1B2A !important;
+}
+</style>

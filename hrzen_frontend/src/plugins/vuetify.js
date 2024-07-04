@@ -6,11 +6,12 @@ const vuetify = createVuetify({
   theme: {
     themes: {
       light: {
-        primary: '#3F51B5',
-        secondary: '#E8EAF6',
-        accent: '#FF4081',
+        primary: '#0D1B2A',
+        secondary: '#1B263B',
+        accent: '#415A77',
+        info: '#778DA9',
+        background: '#E0E1DD',
         error: '#FF5252',
-        info: '#2196F3',
         success: '#4CAF50',
         warning: '#FB8C00',
       },

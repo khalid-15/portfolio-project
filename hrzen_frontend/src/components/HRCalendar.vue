@@ -6,8 +6,8 @@
           <v-card-title class="d-flex flex-row mb-6">
             HR Calendar
             <v-spacer></v-spacer>
-            <v-btn @click="showAddEventDialog" color="primary" class="mr-2">Add Event</v-btn>
-            <v-btn @click="fetchEvents" color="secondary">Refresh Events</v-btn>
+            <v-btn @click="showAddEventDialog" class="add-event-btn mr-2">Add Event</v-btn>
+            <v-btn @click="fetchEvents" class="refresh-event-btn">Refresh Events</v-btn>
           </v-card-title>
           <v-card-text>
             <v-calendar
@@ -27,7 +27,7 @@
             <div v-for="event in filteredEvents" :key="event.id" class="mb-2">
               <div>{{ event.title }}</div>
               <div>{{ event.date }}</div>
-              <v-icon small color="primary" class="mr-2" @click="showEditEventDialog(event)">mdi-pencil</v-icon>
+              <v-icon small class="mr-2" @click="showEditEventDialog(event)">mdi-pencil</v-icon>
               <v-icon small color="red" @click="confirmDelete(event.id)">mdi-delete</v-icon>
               <v-divider class="my-2"></v-divider>
             </div>
@@ -176,11 +176,28 @@ export default {
 
 <style scoped>
 .v-card-title {
-  background-color: #3F51B5;
+  background-color: #415A77;
   color: white;
+}
+.add-event-btn {
+  background-color: #778DA9 !important;
+  color: white !important;
+}
+.refresh-event-btn {
+  background-color: #E0E1DD !important;
+  color: #415A77 !important;
+}
+.cancel-btn {
+  background-color: #E0E1DD !important;
+  color: #415A77 !important;
+}
+.delete-btn {
+  background-color: red !important;
+  color: white !important;
 }
 .mr-2 {
   margin-right: 8px;
+  color: #1B263B;
 }
 .my-2 {
   margin-top: 8px;

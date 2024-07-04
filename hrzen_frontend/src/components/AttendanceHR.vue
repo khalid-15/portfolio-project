@@ -4,9 +4,7 @@
       <v-card-title class="d-flex flex-row mb-6">
         Attendance Records
         <v-spacer></v-spacer>
-        <v-btn icon @click="downloadAttendance">
-          <v-icon color="primary">mdi-download</v-icon>
-        </v-btn>
+        <v-btn @click="downloadEmployees" class="download-employee-btn">Download Employees</v-btn>
       </v-card-title>
       <v-data-table
         :headers="headers"
@@ -46,12 +44,11 @@ export default {
     return {
       attendanceRecords: [],
       headers: [
-        { text: 'ID', value: 'id', align: 'start', sortable: true },
-        { text: 'Employee ID', value: 'employee_id', align: 'start', sortable: true },
-        { text: 'Employee Name', value: 'employee_name', align: 'start', sortable: true },
-        { text: 'Date', value: 'date', align: 'start', sortable: true },
-        { text: 'Status', value: 'status', align: 'start', sortable: true },
-        { text: 'Actions', value: 'actions', align: 'center', sortable: false },
+        { title: 'Employee Name', value: 'employee_name', align: 'start', sortable: true },
+        { title: 'Date', value: 'date', align: 'start', sortable: true },
+        { title: 'Time', value: 'time', align: 'start', sortable: true },
+        { title: 'Status', value: 'status', align: 'start', sortable: true },
+        { title: 'Actions', value: 'actions', align: 'center', sortable: false },
       ],
       confirmDeleteDialog: false,
       attendanceToDelete: null,
@@ -69,7 +66,13 @@ export default {
         }
       })
       .then(response => {
-        this.attendanceRecords = response.data;
+        this.attendanceRecords = response.data.map(record => ({
+          employee_name: record.employee_name,
+          date: record.date.split('T')[0],
+          time: new Date(record.date).toLocaleTimeString(),
+          status: record.status,
+          id: record.id
+        }));
       })
       .catch(error => {
         console.error("There was an error fetching the attendance records!", error);
@@ -131,10 +134,19 @@ export default {
 
 <style scoped>
 .v-card-title {
-  background-color: #3F51B5;
+  background-color: #415A77;
   color: white;
 }
-.v-btn {
-  margin-right: 8px;
+.download-btn {
+  background-color: #778DA9 !important;
+  color: white !important;
+}
+.custom-table-header .v-data-table-header {
+  background-color: #415A77 !important;
+  color: white !important;
+}
+.download-employee-btn {
+  background-color: #E0E1DD !important;
+  color: #415A77 !important;
 }
 </style>

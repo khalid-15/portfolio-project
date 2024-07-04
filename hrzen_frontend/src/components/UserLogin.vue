@@ -6,8 +6,7 @@
         <v-form>
           <v-text-field label="Email" v-model="email" required></v-text-field>
           <v-text-field label="Password" v-model="password" type="password" required></v-text-field>
-          <v-btn class="custom-btn mt-4" @click="login">Login</v-btn>
-        </v-form>
+        </v-form><v-btn class="login-btn mt-4" @click="login">Login</v-btn>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn text @click="redirectToRegister">Don't have an account? Register</v-btn>
@@ -62,22 +61,27 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+  background-color: #1B263B;
 }
 
 .v-card {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.custom-btn {
+.login-btn {
   width: 100%;
-  background-color: #1976D2;
-  color: white;
+  background-color: #778DA9 !important;
+  color: white !important;
   border-radius: 8px;
   padding: 10px 0;
   transition: background-color 0.3s;
 }
 
-.custom-btn:hover {
-  background-color: #1565C0;
+.login-btn:hover {
+  background-color: #415A77 !important;
+}
+
+.v-card-title {
+  color: #1B263B;
 }
 </style>

@@ -24,8 +24,8 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="blue darken-1" text @click="closeDialog">Cancel</v-btn>
-        <v-btn color="blue darken-1" text @click="updateEmployee">Save</v-btn>
+        <v-btn class="cancel-btn" text @click="closeDialog">Cancel</v-btn>
+        <v-btn class="save-btn" text @click="updateEmployee">Save</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -103,3 +103,17 @@ export default {
   }
 };
 </script>
+<style scoped>
+.cancel-btn {
+  background-color: #E0E1DD !important;
+  color: #415A77 !important;
+}
+.save-btn {
+  background-color: #778DA9 !important;
+  color: white !important;
+}
+.v-card-title{
+  background-color: #1B263B;
+  color: #E0E1DD;
+}
+</style>

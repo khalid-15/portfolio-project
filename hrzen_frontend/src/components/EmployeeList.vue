@@ -4,8 +4,8 @@
       <v-card-title class="d-flex flex-row mb-6">
         Employees
         <v-spacer></v-spacer>
-        <v-btn @click="showAddEmployeeDialog" color="primary" class="mr-2">Add Employee</v-btn>
-        <v-btn @click="downloadEmployees" color="secondary">Download Employees</v-btn>
+        <v-btn @click="showAddEmployeeDialog"  class="add-employee-btn mr-2">Add Employee</v-btn>
+        <v-btn @click="downloadEmployees" class="download-employee-btn">Download Employees</v-btn>
       </v-card-title>
       <v-card-text>
         <v-data-table
@@ -15,7 +15,7 @@
           class="elevation-1"
         >
           <template v-slot:[`item.actions`]="{ item }">
-            <v-icon small color="primary" class="mr-2" @click="showEditEmployeeDialog(item)">mdi-pencil</v-icon>
+            <v-icon small color="#1B263B" class="mr-2" @click="showEditEmployeeDialog(item)">mdi-pencil</v-icon>
             <v-icon small color="red" @click="confirmDeleteEmployee(item.id)">mdi-delete</v-icon>
           </template>
         </v-data-table>
@@ -56,12 +56,11 @@ export default {
     return {
       employees: [],
       headers: [
-        { text: 'ID', value: 'id', align: 'start', sortable: true },
-        { text: 'Name', value: 'name', align: 'start', sortable: true },
-        { text: 'Position', value: 'position', align: 'start', sortable: true },
-        { text: 'Salary', value: 'salary', align: 'start', sortable: true },
-        { text: 'Email', value: 'email', align: 'start', sortable: true },
-        { text: 'Actions', value: 'actions', align: 'center', sortable: false },
+      { title: 'Name', value: 'name', align: 'start', sortable: true },
+        { title: 'Position', value: 'position', align: 'start', sortable: true },
+        { title: 'Salary', value: 'salary', align: 'start', sortable: true },
+        { title: 'Email', value: 'email', align: 'start', sortable: true },
+        { title: 'Actions', value: 'actions', align: 'center', sortable: false },
       ],
       addDialog: false,
       editDialog: false,
@@ -173,10 +172,19 @@ export default {
 
 <style scoped>
 .v-card-title {
-  background-color: #3F51B5;
+  background-color: #415A77;
   color: white;
 }
 .mr-2 {
   margin-right: 8px;
 }
+.add-employee-btn {
+  background-color: #778DA9 !important;
+  color: white !important;
+}
+.download-employee-btn {
+  background-color: #E0E1DD !important;
+  color: #415A77 !important;
+}
+
 </style>
