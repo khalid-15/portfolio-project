@@ -11,12 +11,25 @@ from functools import wraps
 app = Flask(__name__)
 CORS(app)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'postgresql://hrzen_database_user:GS7xPgJYd9c2s1hEchjWpeSChADTYOQA@dpg-cq3fmjaju9rs739eaf6g-a.oregon-postgres.render.com/hrzen_database')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', '980f62122762665d538c9a5a13276023')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY')
+
 db = SQLAlchemy(app)
 
-
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = request.headers.get('Authorization')
+        if not token:
+            return jsonify({'message': 'Token is missing!'}), 403
+        try:
+            data = jwt.decode(token, app.config['JWT_SECRET_KEY'], algorithms=["HS256"])
+        except:
+            return jsonify({'message': 'Token is invalid!'}), 403
+        return f(*args, **kwargs)
+    return decorated
 
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///hrzen.db'
 # app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -44,20 +57,20 @@ class Attendance(db.Model):
     status = db.Column(db.String(50), nullable=False)
     employee = db.relationship('Employee', backref=db.backref('attendance', lazy=True))
 
-def token_required(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        token = request.headers.get('Authorization')
-        if not token:
-            return jsonify({'message': 'Token is missing!'}), 403
-        try:
-            token = token.split()[1]
-            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
-            current_user = Employee.query.filter_by(id=data['id']).first()
-        except:
-            return jsonify({'message': 'Token is invalid!'}), 403
-        return f(current_user, *args, **kwargs)
-    return decorated
+# def token_required(f):
+#     @wraps(f)
+#     def decorated(*args, **kwargs):
+#         token = request.headers.get('Authorization')
+#         if not token:
+#             return jsonify({'message': 'Token is missing!'}), 403
+#         try:
+#             token = token.split()[1]
+#             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+#             current_user = Employee.query.filter_by(id=data['id']).first()
+#         except:
+#             return jsonify({'message': 'Token is invalid!'}), 403
+#         return f(current_user, *args, **kwargs)
+#     return decorated
 
 
 @app.route('/register', methods=['POST'])
