@@ -284,8 +284,15 @@ def delete_attendance(current_user, id):
 def home():
     return jsonify(message="Welcome to HRZen")
 
+# if __name__ == '__main__':
+#     with app.app_context():
+#         db.create_all()
+#     app.run(debug=True)
+
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
+    if os.environ.get('INIT_DB') == 'True':
+        with app.app_context():
+            db.create_all()
+            print("Initialized the database schema")
     app.run(debug=True)
     
