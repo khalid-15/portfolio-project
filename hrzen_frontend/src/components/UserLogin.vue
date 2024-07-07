@@ -36,6 +36,7 @@ export default {
           password: this.password
         });
         localStorage.setItem('token', response.data.token);
+        console.log(response.data.token);
         localStorage.setItem('role', response.data.role);
         useToast().success('Logged in successfully!');
         if (response.data.first_login) {
