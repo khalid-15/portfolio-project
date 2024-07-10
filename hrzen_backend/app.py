@@ -94,7 +94,7 @@ def login():
     if user and check_password_hash(user.password, data['password']):
         token = jwt.encode({'id': user.id, 'exp': datetime.utcnow() + timedelta(hours=24)}, app.config['JWT_SECRET_KEY'])
         print(f"Token generated: {token}")
-        return jsonify({'token': token, 'role': user.role}), 200
+        return jsonify({'token': str(token), 'role': user.role}), 200
     return jsonify({'message': 'Invalid credentials'}), 401
 
 @app.route('/change-password', methods=['POST'])
