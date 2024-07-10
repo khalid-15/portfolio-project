@@ -9,7 +9,7 @@ import jwt
 from functools import wraps
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=["http://localhost:8080", "https://hrzen-lfsf.onrender.com"])
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False

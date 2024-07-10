@@ -75,7 +75,7 @@ export default {
   methods: {
     fetchEmployees() {
       const token = localStorage.getItem('token');
-      axios.get('http://localhost:5000/api/employees', {
+      axios.get('https://hr-system-wcp8.onrender.com/api/employees', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -101,7 +101,7 @@ export default {
     deleteEmployee() {
       const toast = useToast();
       const token = localStorage.getItem('token');
-      axios.delete(`http://localhost:5000/api/employees/${this.employeeToDelete}`, {
+      axios.delete(`https://hr-system-wcp8.onrender.com/api/employees/${this.employeeToDelete}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -118,7 +118,7 @@ export default {
     },
     downloadEmployees() {
       const token = localStorage.getItem('token');
-      axios.get('http://localhost:5000/api/employees', {
+      axios.get('https://hr-system-wcp8.onrender.com/api/employees', {
         headers: {
           'Authorization': `Bearer ${token}`
         }

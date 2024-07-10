@@ -33,7 +33,7 @@
       changePassword() {
         const toast = useToast();
         const token = localStorage.getItem('token');
-        axios.post('http://localhost:5000/change-password', {
+        axios.post('https://hr-system-wcp8.onrender.com/change-password', {
           token: token,
           current_password: this.currentPassword,
           new_password: this.newPassword

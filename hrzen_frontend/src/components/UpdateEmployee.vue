@@ -71,7 +71,7 @@ export default {
     updateEmployee() {
   const toast = useToast();
   const token = localStorage.getItem('token');
-  axios.put(`http://localhost:5000/api/employees/${this.localEmployee.id}`, this.localEmployee, {
+  axios.put(`https://hr-system-wcp8.onrender.com/api/employees/${this.localEmployee.id}`, this.localEmployee, {
     headers: {
       'Authorization': `Bearer ${token}`
     }
@@ -89,7 +89,7 @@ export default {
   
     // updateEmployee() {
     //   const toast = useToast();
-    //   axios.put(`http://localhost:5000/api/employees/${this.localEmployee.id}`, this.localEmployee)
+    //   axios.put(`https://hr-system-wcp8.onrender.com/api/employees/${this.localEmployee.id}`, this.localEmployee)
     //     .then(() => {
     //       this.$emit('employee-updated');
     //       toast.success('Employee updated successfully!');

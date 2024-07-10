@@ -60,7 +60,7 @@ export default {
   methods: {
     fetchAttendanceRecords() {
       const token = localStorage.getItem('token');
-      axios.get('http://localhost:5000/api/attendance', {
+      axios.get('https://hr-system-wcp8.onrender.com/api/attendance', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -85,7 +85,7 @@ export default {
     deleteAttendance() {
       const toast = useToast();
       const token = localStorage.getItem('token');
-      axios.delete(`http://localhost:5000/api/attendance/${this.attendanceToDelete}`, {
+      axios.delete(`https://hr-system-wcp8.onrender.com/api/attendance/${this.attendanceToDelete}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -102,7 +102,7 @@ export default {
     },
     downloadAttendance() {
       const token = localStorage.getItem('token');
-      axios.get('http://localhost:5000/api/attendance', {
+      axios.get('https://hr-system-wcp8.onrender.com/api/attendance', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
