@@ -78,7 +78,7 @@ export default {
 
     // const fetchEvents = async () => {
     //   try {
-    //     const response = await axios.get('http://localhost:5000/api/events');
+    //     const response = await axios.get('https://hr-system-wcp8.onrender.com/api/events');
     //     events.value = response.data;
     //   } catch (error) {
     //     toast.error('Failed to fetch events');
@@ -88,7 +88,7 @@ export default {
     const fetchEvents = async () => {
       const token = localStorage.getItem('token');
       try {
-        const response = await axios.get('http://localhost:5000/api/events', {
+        const response = await axios.get('https://hr-system-wcp8.onrender.com/api/events', {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -116,7 +116,7 @@ export default {
     const deleteEvent = async () => {
       const token = localStorage.getItem('token');
       try {
-        await axios.delete(`http://localhost:5000/api/events/${eventIdToDelete.value}`, {
+        await axios.delete(`https://hr-system-wcp8.onrender.com/api/events/${eventIdToDelete.value}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -131,7 +131,7 @@ export default {
 
     // const deleteEvent = async () => {
     //   try {
-    //     await axios.delete(`http://localhost:5000/api/events/${eventIdToDelete.value}`);
+    //     await axios.delete(`https://hr-system-wcp8.onrender.com/api/events/${eventIdToDelete.value}`);
     //     toast.success('Event deleted successfully');
     //     fetchEvents();
     //     closeDeleteDialog();

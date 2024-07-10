@@ -55,7 +55,7 @@ export default {
     //   }
 
     //   try {
-    //     await axios.post('http://localhost:5000/api/events', {
+    //     await axios.post('https://hr-system-wcp8.onrender.com/api/events', {
     //       title: event.value.title,
     //       date: event.value.date.toISOString()
     //     });
@@ -75,7 +75,7 @@ export default {
       }
 
       try {
-        await axios.post('http://localhost:5000/api/events', {
+        await axios.post('https://hr-system-wcp8.onrender.com/api/events', {
           title: event.value.title,
           date: event.value.date.toISOString()
         }, {

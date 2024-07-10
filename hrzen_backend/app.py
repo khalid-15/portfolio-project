@@ -9,19 +9,36 @@ import jwt
 from functools import wraps
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=["http://localhost:8080", "https://hrzen-lfsf.onrender.com"])
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'postgresql://hrzen_database_user:GS7xPgJYd9c2s1hEchjWpeSChADTYOQA@dpg-cq3fmjaju9rs739eaf6g-a.oregon-postgres.render.com/hrzen_database')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', '980f62122762665d538c9a5a13276023')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY')
+
 db = SQLAlchemy(app)
 
-
-
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///hrzen.db'
-# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-# app.config['SECRET_KEY'] = 'your_secret_key'
-# db = SQLAlchemy(app)
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = request.headers.get('Authorization')
+        if not token:
+            return jsonify({'message': 'Token is missing!'}), 403
+        try:
+            token = token.split()[1]  
+            print(f"Token received: {token}")
+            data = jwt.decode(token, app.config['JWT_SECRET_KEY'], algorithms=["HS256"])
+            print(f"Decoded token data: {data}")
+            current_user = Employee.query.filter_by(id=data['id']).first()
+            if not current_user:
+                return jsonify({'message': 'User not found!'}), 403
+        except jwt.ExpiredSignatureError:
+            return jsonify({'message': 'Token has expired!'}), 403
+        except jwt.InvalidTokenError as e:
+            print(f"Token error: {e}")
+            return jsonify({'message': 'Token is invalid!'}), 403
+        return f(current_user, *args, **kwargs)
+    return decorated
 
 class Employee(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -43,22 +60,6 @@ class Attendance(db.Model):
     date = db.Column(db.Date, nullable=False)
     status = db.Column(db.String(50), nullable=False)
     employee = db.relationship('Employee', backref=db.backref('attendance', lazy=True))
-
-def token_required(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        token = request.headers.get('Authorization')
-        if not token:
-            return jsonify({'message': 'Token is missing!'}), 403
-        try:
-            token = token.split()[1]
-            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
-            current_user = Employee.query.filter_by(id=data['id']).first()
-        except:
-            return jsonify({'message': 'Token is invalid!'}), 403
-        return f(current_user, *args, **kwargs)
-    return decorated
-
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -91,20 +92,27 @@ def login():
 
     user = Employee.query.filter_by(email=data['email']).first()
     if user and check_password_hash(user.password, data['password']):
-        token = jwt.encode({'id': user.id, 'exp': datetime.utcnow() + timedelta(hours=24)}, app.config['SECRET_KEY'])
-        return jsonify({'token': token, 'role': user.role}), 200
+        token = jwt.encode({'id': user.id, 'exp': datetime.utcnow() + timedelta(hours=24)}, app.config['JWT_SECRET_KEY'], algorithm=["HS256"])
+        print(f"Token generated: {token}")
+        return jsonify({'token': str(token), 'role': user.role}), 200
     return jsonify({'message': 'Invalid credentials'}), 401
 
 @app.route('/change-password', methods=['POST'])
 def change_password():
     data = request.json
-    user_id = jwt.decode(data['token'].split()[1], app.config['SECRET_KEY'], algorithms=["HS256"])['id']
-    user = Employee.query.get(user_id)
-    if user and check_password_hash(user.password, data['current_password']):
-        user.password = generate_password_hash(data['new_password'], method='sha256')
-        db.session.commit()
-        return jsonify({'message': 'Password changed successfully'}), 200
-    return jsonify({'message': 'Invalid credentials'}), 401
+    try:
+        user_id = jwt.decode(data['token'].split()[1], app.config['JWT_SECRET_KEY'], algorithms=["HS256"])['id']
+        user = Employee.query.get(user_id)
+        if user and check_password_hash(user.password, data['current_password']):
+            user.password = generate_password_hash(data['new_password'], method='sha256')
+            db.session.commit()
+            return jsonify({'message': 'Password changed successfully'}), 200
+        return jsonify({'message': 'Invalid credentials'}), 401
+    except jwt.ExpiredSignatureError:
+        return jsonify({'message': 'Token has expired!'}), 403
+    except jwt.InvalidTokenError as e:
+        print(f"Token error: {e}")
+        return jsonify({'message': 'Token is invalid!'}), 403
 
 @app.route('/api/employees', methods=['GET'])
 @token_required
@@ -143,8 +151,6 @@ def add_employee(current_user):
     except IntegrityError:
         db.session.rollback()
         return jsonify({'message': 'Employee with this email already exists'}), 400
-
-
 
 @app.route('/api/employees/<int:id>', methods=['PUT'])
 @token_required
@@ -223,7 +229,6 @@ def delete_event(current_user, id):
         return jsonify({'message': 'Event deleted successfully'})
     return jsonify({'message': 'Event not found'}), 404
 
-
 @app.route('/api/attendance', methods=['GET'])
 @token_required
 def get_attendance(current_user):
@@ -272,7 +277,8 @@ def home():
     return jsonify(message="Welcome to HRZen")
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
+    if os.environ.get('INIT_DB') == 'True':
+        with app.app_context():
+            db.create_all()
+            print("Initialized the database schema")
     app.run(debug=True)
-    

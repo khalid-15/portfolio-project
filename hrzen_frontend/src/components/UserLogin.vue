@@ -31,11 +31,12 @@ export default {
   methods: {
     async login() {
       try {
-        const response = await axios.post('http://localhost:5000/login', {
+        const response = await axios.post('https://hr-system-wcp8.onrender.com/login', {
           email: this.email,
           password: this.password
         });
         localStorage.setItem('token', response.data.token);
+        console.log(response.data.token);
         localStorage.setItem('role', response.data.role);
         useToast().success('Logged in successfully!');
         if (response.data.first_login) {

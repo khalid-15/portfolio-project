@@ -57,7 +57,7 @@ export default {
       }
 
       try {
-        await axios.put(`http://localhost:5000/api/events/${localEvent.value.id}`, {
+        await axios.put(`https://hr-system-wcp8.onrender.com/api/events/${localEvent.value.id}`, {
           title: localEvent.value.title,
           date: localEvent.value.date.toISOString().split('T')[0]
         }, {
